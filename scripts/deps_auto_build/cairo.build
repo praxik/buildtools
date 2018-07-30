@@ -1,0 +1,55 @@
+PACKAGE_NAME=cairo
+BASE_DIR="${DEV_BASE_DIR}/cairo-1.14.12"
+
+SOURCE_RETRIEVAL_METHOD=wget
+SOURCE_FORMAT=xz
+SOURCE_URL=https://cairographics.org/releases/cairo-1.14.12.tar.xz
+
+SOURCE_DIR="${BASE_DIR}"
+BUILD_DIR="${BASE_DIR}/build-${ARCH}"
+INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+case $PLATFORM in
+  Windows)
+    POST_RETRIEVAL_METHOD=( "cp -R ${VES_SRC_DIR}/patches/cairo/* ${SOURCE_DIR}" )
+    #POST_RETRIEVAL_METHOD+=( "sed -i 's/\(CAIRO_LIBS\s\++=\s\+\$(\(LIBPNG\|ZLIB\)_\)PATH.*/\1LIBS)/g' ${SOURCE_DIR}/build/Makefile.win32.common" )
+    POST_RETRIEVAL_METHOD+=( "sed -i 's/\(CAIRO_HAS_FT_FONT=\)0/\11/g' ${SOURCE_DIR}/build/Makefile.win32.features" )
+
+    CFG=release
+
+    #HACK to remove all existing obj files as bug in clean script
+    PREBUILD_METHOD=custom
+    CUSTOM_PREBUILD+=( "find src/${CFG} -type f -name '*.obj' -exec rm {} \;" )
+
+    BUILD_DIR="${BASE_DIR}"
+    BUILD_METHOD=make
+    MAKE_ARGS+=( "-f Makefile.win32 CFG=${CFG} -e" )
+    MAKE_ARGS+=( "PIXMAN_CFLAGS=\"-I${pixman_INSTALL_DIR}/include\"" )
+    MAKE_ARGS+=( "PIXMAN_LIBS=\"${pixman_INSTALL_DIR}/lib/pixman-1.lib\"" )
+    MAKE_ARGS+=( "LIBPNG_CFLAGS=\"-I${PNG_INSTALL_DIR}/include\"" )
+    MAKE_ARGS+=( "LIBPNG_LIBS=\"${PNG_INSTALL_DIR}/lib/libpng16_static.lib\"" )
+    MAKE_ARGS+=( "ZLIB_CFLAGS=\"-I${ZLIB_INSTALL_DIR}/include\"" )
+    MAKE_ARGS+=( "ZLIB_LIBS=\"${ZLIB_INSTALL_DIR}/lib/zlibstatic.lib\"" )
+    MAKE_ARGS+=( "FREETYPE_CFLAGS=\"-I${freetype_INSTALL_DIR}/include/freetype2\"" )
+    MAKE_ARGS+=( "FREETYPE_LIBS=\"${freetype_INSTALL_DIR}/lib/freetype.lib\"" )
+
+    POST_BUILD_METHOD+=( "mkdir -p ${INSTALL_DIR}/bin" )
+    POST_BUILD_METHOD+=( "mkdir -p ${INSTALL_DIR}/include" )
+    POST_BUILD_METHOD+=( "mkdir -p ${INSTALL_DIR}/lib" )
+    POST_BUILD_METHOD+=( "cp src/${CFG}/*.dll ${INSTALL_DIR}/bin" )
+    POST_BUILD_METHOD+=( "cp cairo-version.h src/cairo-features.h src/cairo.h src/cairo-deprecated.h src/cairo-win32.h src/cairo-script.h src/cairo-ps.h src/cairo-pdf.h src/cairo-ft.h src/cairo-svg.h src/cairo-svg-surface-private.h ${INSTALL_DIR}/include" )
+    POST_BUILD_METHOD+=( "cp src/${CFG}/*.lib ${INSTALL_DIR}/lib" )
+    ;;
+  Darwin)
+    export PKG_CONFIG_PATH=${PNG_INSTALL_DIR}/lib/pkgconfig:${pixman_INSTALL_DIR}/lib/pkgconfig/:${freetype_INSTALL_DIR}/lib/pkgconfig
+    PREBUILD_METHOD=configure
+    CONFIGURE=../configure
+    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    ;;
+  Linux)
+    export PKG_CONFIG_PATH=${PNG_INSTALL_DIR}/lib/pkgconfig:${pixman_INSTALL_DIR}/lib/pkgconfig/:${freetype_INSTALL_DIR}/lib/pkgconfig
+    PREBUILD_METHOD=configure
+    CONFIGURE=../configure
+    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    ;;
+esac

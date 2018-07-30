@@ -1,0 +1,13 @@
+prefix=${fp_file_cwd}\..\..
+exec_prefix=${prefix}
+libdir=${exec_prefix}\lib
+includedir=${prefix}\include
+
+Name: POCO
+Description: POCO release pre-compiled for VES
+Provides: POCO
+Requires: 
+Version: 1.5.1
+Libs: /libpath:"${libdir}" PocoData.lib PocoFoundation.lib PocoDataODBC.lib PocoDataSQLite.lib
+Cflags: /I"${includedir}"
+Arch: noarch

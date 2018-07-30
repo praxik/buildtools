@@ -1,0 +1,43 @@
+PACKAGE_NAME=OSGEPHEMERIS
+BASE_DIR="${DEV_BASE_DIR}/osgEphemeris/osgEphemeris"
+
+SOURCE_URL=https://github.com/pmartz/osgephemeris.git
+SOURCE_RETRIEVAL_METHOD=git
+
+SOURCE_DIR="${BASE_DIR}"
+BUILD_DIR="${BASE_DIR}/build-${ARCH}"
+INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+PREBUILD_METHOD=cmake
+
+SKIP_FPC_INSTALL="no"
+FPC_FILE=osgephemeris.fpc
+
+CMAKE_PARAMS+=( -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" )
+CMAKE_PARAMS+=( -DOSGInstallType="Alternate Install Location" )
+CMAKE_PARAMS+=( -DOSGInstallLocation="${OSG_INSTALL_DIR}" )
+
+VES_INSTALL_PARAMS+=( lib )
+
+case $PLATFORM in
+  Windows)
+    CMAKE_PARAMS+=( -DCMAKE_RELWITHDEBINFO_POSTFIX="" )
+    CMAKE_PARAMS+=( -DCMAKE_CONFIGURATION_TYPES="${BUILD_TYPE}" )
+    MSVC_CONFIG="${BUILD_TYPE}"
+    if [ ${ARCH} = "32-bit" ]; then
+      MSVC_PLATFORM=Win32
+    else
+      MSVC_PLATFORM=x64
+    fi
+    MSVC_SOLUTION="osgEphemeris.sln"
+    #MSVC_PROJECT_NAMES+=( INSTALL )
+    ;;
+  Darwin )
+    CMAKE_PARAMS+=( -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" )
+    CMAKE_PARAMS+=( -DLIB_POSTFIX="" )
+    CMAKE_PARAMS+=( -DCMAKE_CXX_FLAGS="-std=c++11 -stdlib=libc++" )
+    ;;
+  Linux)
+    CMAKE_PARAMS+=( -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" )
+    CMAKE_PARAMS+=( -DLIB_POSTFIX="" )
+    ;;
+esac

@@ -1,0 +1,33 @@
+PACKAGE_NAME=cmake
+
+SOURCE_RETRIEVAL_METHOD=wget
+
+unset PROJ_STR
+unset BUILD_TARGET
+unset BUILD_STR
+
+case $PLATFORM in
+  Windows)
+    BASE_DIR="${DEV_BASE_DIR}/cmake-3.10.2-win64-x64"
+    SOURCE_FORMAT=zip
+    SOURCE_URL=http://www.cmake.org/files/v3.10/cmake-3.10.2-win64-x64.zip
+    ;;
+  Darwin )
+    BASE_DIR="${DEV_BASE_DIR}/cmake-3.10.2-Darwin-x86_64"
+    SOURCE_FORMAT=tgz
+    SOURCE_URL=http://www.cmake.org/files/v3.10/cmake-3.10.2-Darwin-x86_64.tar.gz
+    ;;
+  Linux )
+    BASE_DIR="${DEV_BASE_DIR}/cmake-3.10.2-Linux-x86_64"
+    SOURCE_FORMAT=tgz
+    SOURCE_URL=http://www.cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.tar.gz
+    ;;
+esac
+
+SOURCE_DIR="${BASE_DIR}"
+BUILD_DIR="${BASE_DIR}"
+INSTALL_DIR="${BASE_DIR}"
+
+#TODO: Update cmake once it supports boost 1.66
+MODULE_DIR="${SOURCE_DIR}/share/cmake-3.10/Modules"
+POST_RETRIEVAL_METHOD=( "cp -R ${VES_SRC_DIR}/patches/cmake/* ${MODULE_DIR}" )

@@ -1,0 +1,27 @@
+PACKAGE_NAME=ruby
+BASE_DIR="${DEV_BASE_DIR}/ruby-2.1.2"
+
+SOURCE_RETRIEVAL_METHOD=wget
+SOURCE_URL=http://cache.ruby-lang.org/pub/ruby/2.1/ruby-2.1.2.tar.gz
+SOURCE_FORMAT=tgz
+
+SOURCE_DIR="${BASE_DIR}"
+BUILD_DIR="${BASE_DIR}/build-${ARCH}"
+INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+case $PLATFORM in
+  Windows)
+    unset PROJ_STR
+    unset BUILD_TARGET
+    unset MSVC_CONFIG
+
+    PREBUILD_METHOD=custom
+    CUSTOM_PREBUILD=( "cmd /c \"vcvarsall.bat && ..\\win32\\configure.bat\"" )
+
+    BUILD_METHOD=nmake
+    ;;
+  Darwin)
+    ;;
+  Linux)
+    ;;
+esac

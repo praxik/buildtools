@@ -1,0 +1,33 @@
+PACKAGE_NAME=hdf
+BASE_DIR="${DEV_BASE_DIR}/hdf-4.2.10"
+
+SOURCE_RETRIEVAL_METHOD=wget
+SOURCE_URL=http://www.hdfgroup.org/ftp/HDF/HDF_Current/src/hdf-4.2.10.tar.gz
+SOURCE_FORMAT=tgz
+
+SOURCE_DIR="${BASE_DIR}"
+BUILD_DIR="${BASE_DIR}/build-${ARCH}"
+INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+#HACK
+POST_RETRIEVAL_METHOD=( "sed -i 's/\(H4_VERS_SUBRELEASE \)\${_hfile_h_contents}/\10/g' CMakeLists.txt" )
+
+PREBUILD_METHOD=cmake
+BUILD_METHOD=cmake
+
+CMAKE_PARAMS+=( -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" )
+CMAKE_PARAMS+=( -DHDF4_BUILD_FORTRAN=OFF )
+CMAKE_PARAMS+=( -DHDF4_ENABLE_NETCDF=FALSE )
+
+case $PLATFORM in
+  Windows)
+    CMAKE_PARAMS+=( -DJPEG_INCLUDE_DIR="${jpeg_INSTALL_DIR}/include" )
+    CMAKE_PARAMS+=( -DJPEG_LIBRARY="${jpeg_INSTALL_DIR}/lib/jpeg.lib" )
+    CMAKE_PARAMS+=( -DZLIB_INCLUDE_DIR="${ZLIB_INSTALL_DIR}/include" )
+    CMAKE_PARAMS+=( -DZLIB_LIBRARY="${ZLIB_INSTALL_DIR}/lib/zlib.lib" )
+    ;;
+  Darwin)
+    ;;
+  Linux)
+    ;;
+esac

@@ -1,0 +1,46 @@
+PACKAGE_NAME=OPENSSL
+BASE_DIR="${DEV_BASE_DIR}/openssl-1.0.2n"
+
+SOURCE_RETRIEVAL_METHOD=wget
+SOURCE_URL=https://www.openssl.org/source/openssl-1.0.2n.tar.gz
+SOURCE_FORMAT=tgz
+
+case $PLATFORM in
+  Windows)
+    PREBUILD_METHOD=custom
+    BUILD_METHOD=nmake
+
+    if [ ${ARCH} = "32-bit" ]; then
+      CONF_STR1=VC-WIN32
+      CONF_STR2=do_ms
+      BASE_DIR="${BASE_DIR}-x86"
+    else
+      CONF_STR1=VC-WIN64A
+      CONF_STR2=do_win64a
+      BASE_DIR="${BASE_DIR}-x64"
+    fi
+
+    SOURCE_DIR="${BASE_DIR}"
+    BUILD_DIR="${BASE_DIR}"
+    INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+    #Use ActiveState Perl and not Cygwin Perl
+    ACTIVE_PERL="C:/Perl64/bin"
+    CUSTOM_PREBUILD=( "cmd /c \"set PATH=${ACTIVE_PERL//\//\\};%PATH% && perl --version\"" )
+    CUSTOM_PREBUILD+=( "cmd /c \"set PATH=${ACTIVE_PERL//\//\\};%PATH% && perl Configure ${CONF_STR1} no-asm --prefix=${BASE_DIR//\//\\}\"" )
+    CUSTOM_PREBUILD+=( "cmd /c \"set PATH=${ACTIVE_PERL//\//\\};%PATH% && ms\\${CONF_STR2}.bat\"" )
+
+    NMAKE_ARGS="/f ms/nt.mak"
+    NMAKE_INST_ARG=install
+
+    POST_BUILD_METHOD+=( "mkdir -p ${INSTALL_DIR}/include" )
+    POST_BUILD_METHOD+=( "cp --parents -r bin ${INSTALL_DIR}" )
+    POST_BUILD_METHOD+=( "cp -r inc32/openssl ${INSTALL_DIR}/include/openssl" )
+    POST_BUILD_METHOD+=( "cp --parents -r lib ${INSTALL_DIR}" )
+    POST_BUILD_METHOD+=( "cp --parents ssl/openssl.cnf ${INSTALL_DIR}" )
+    ;;
+  Darwin)
+    ;;
+  Linux)
+    ;;
+esac

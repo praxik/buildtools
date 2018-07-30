@@ -1,0 +1,50 @@
+PACKAGE_NAME=freetype
+BASE_DIR="${DEV_BASE_DIR}/freetype-2.9"
+
+SOURCE_RETRIEVAL_METHOD=wget
+SOURCE_URL=http://download.savannah.gnu.org/releases/freetype/freetype-2.9.tar.gz
+SOURCE_FORMAT=tgz
+
+SOURCE_DIR="${BASE_DIR}"
+BUILD_DIR="${BASE_DIR}/build-${ARCH}"
+INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+case $PLATFORM in
+  Windows)
+    POST_RETRIEVAL_METHOD=( "cp -R ${VES_SRC_DIR}/patches/freetype/* ${SOURCE_DIR}" )
+
+    PREBUILD_METHOD=cmake
+    BUILD_METHOD=cmake
+
+    MSVC_CONFIG="${BUILD_TYPE}"
+    if [ ${ARCH} = "32-bit" ]; then
+      MSVC_PLATFORM=Win32
+    else
+      MSVC_PLATFORM=x64
+    fi
+    MSVC_SOLUTION="freetype.sln"
+
+    CMAKE_PARAMS+=( -DCMAKE_CONFIGURATION_TYPES="${BUILD_TYPE}" )
+    CMAKE_PARAMS+=( -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" )
+    CMAKE_PARAMS+=( -DBUILD_SHARED_LIBS=OFF )
+    CMAKE_PARAMS+=( -DWITH_ZLIB=OFF )
+    CMAKE_PARAMS+=( -DWITH_BZip2=OFF )
+    CMAKE_PARAMS+=( -DWITH_PNG=OFF )
+    CMAKE_PARAMS+=( -DWITH_HarfBuzz=OFF )
+    ;;
+  Darwin)
+    export PATH=${PATH}:${PNG_INSTALL_DIR}/bin
+    PREBUILD_METHOD=configure
+    CONFIGURE=../configure
+    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    POST_BUILD_METHOD="make install"
+    ;;
+  Linux)
+    export PATH=${PATH}:${PNG_INSTALL_DIR}/bin
+
+    PREBUILD_METHOD=configure
+    CONFIGURE=../configure
+    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --with-harfbuzz=no )
+    ;;
+esac

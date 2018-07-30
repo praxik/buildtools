@@ -1,0 +1,16 @@
+PACKAGE_NAME=wkhtmltopdf
+
+case $PLATFORM in
+  Linux)
+    BASE_DIR="${DEV_BASE_DIR}/wkhtmltox"
+
+    SOURCE_DIR="${BASE_DIR}"
+    BUILD_DIR="${BASE_DIR}"
+    INSTALL_DIR="${BASE_DIR}"
+
+    SOURCE_RETRIEVAL_METHOD=wget
+    SOURCE_FORMAT=tgz
+    SOURCE_URL=https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.0/wkhtmltox-linux-amd64_0.12.0-03c001d.tar.xz
+    ;;
+
+esac

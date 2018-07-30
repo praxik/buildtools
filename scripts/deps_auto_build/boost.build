@@ -1,0 +1,71 @@
+PACKAGE_NAME=BOOST
+BASE_DIR="${DEV_BASE_DIR}/boost_1_66_0"
+
+SOURCE_RETRIEVAL_METHOD=wget
+
+SOURCE_DIR="${BASE_DIR}"
+BUILD_DIR="${BASE_DIR}/build-${ARCH}"
+INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+BOOST_VERSION=1_66
+BOOST_VERSION_DIR=boost-${BOOST_VERSION}
+
+PREBUILD_METHOD=bjam
+BUILD_METHOD=bjam
+BJAM=${BASE_DIR}/b2
+BJAM_PARAMS+=( variant=release )
+BJAM_PARAMS+=( link=shared,static )
+BJAM_PARAMS+=( threading=multi )
+BJAM_PARAMS+=( runtime-link=shared )
+BJAM_PARAMS+=( --build-dir="${BUILD_DIR}" )
+BJAM_PARAMS+=( --prefix="${INSTALL_DIR}" )
+if [ "$ARCH" = "64-bit" ]; then
+  BJAM_PARAMS+=( address-model=64 )
+else
+  BJAM_PARAMS+=( address-model=32 )
+fi
+BJAM_PARAMS+=( --without-python )
+BJAM_PARAMS+=( --without-wave )
+BJAM_PARAMS+=( --without-graph_parallel )
+BJAM_PARAMS+=( -sICU_PATH="${ICU_INSTALL_DIR}" )
+
+VES_INSTALL_PARAMS+=( lib )
+
+case $PLATFORM in
+  Windows)
+    SOURCE_URL=http://sourceforge.net/projects/boost/files/boost/1.66.0/boost_1_66_0.zip
+    SOURCE_FORMAT=zip
+
+    POST_RETRIEVAL_METHOD+=( "chmod +x bootstrap.bat" )
+
+    BJAM_PREBUILD=./bootstrap.bat
+    BJAM_PARAMS+=( embed-manifest=on )
+    BJAM_PARAMS+=( toolset=${BOOST_TOOLSET} )
+    BJAM_PARAMS+=( -sHAVE_ICU=1 )
+    BJAM_PARAMS+=( -sICU_LINK="/LIBPATH:${ICU_INSTALL_DIR}/lib icuuc.lib icuin.lib icudt.lib" )
+    #There is an actual file called INSTALL in boost src dir
+    BUILD_TARGET=install
+
+    #tools\build\src\tools\msvc.jam calls [ os.environ TEMP ]...
+    export TEMP="/tmp"
+
+    #Cleanup environment
+    POST_BUILD_METHOD=( "unset TEMP" )
+    ;;
+  Darwin)
+    SOURCE_URL=http://sourceforge.net/projects/boost/files/boost/1.66.0/boost_1_66_0.tar.bz2
+    SOURCE_FORMAT=bz2
+
+    BJAM_PREBUILD=./bootstrap.sh
+    BJAM_PARAMS+=( toolset=clang )
+    BJAM_PARAMS+=( cxxflags="-std=c++11 -stdlib=libc++" )
+    BJAM_PARAMS+=( linkflags="-stdlib=libc++" )
+    ;;
+  Linux)
+    SOURCE_URL=http://sourceforge.net/projects/boost/files/boost/1.66.0/boost_1_66_0.tar.bz2
+    SOURCE_FORMAT=bz2
+
+    BJAM_PREBUILD=./bootstrap.sh
+    BJAM_PARAMS+=( cxxflags="-std=c++11" )
+    ;;
+esac

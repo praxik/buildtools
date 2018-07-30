@@ -1,0 +1,56 @@
+PACKAGE_NAME=wxwidgets
+BASE_DIR="${DEV_BASE_DIR}/wxWidgets-3.1.0"
+
+SOURCE_RETRIEVAL_METHOD=wget
+SOURCE_FORMAT=bz2
+SOURCE_URL=https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.0/wxWidgets-3.1.0.tar.bz2
+
+SOURCE_DIR="${BASE_DIR}"
+BUILD_DIR="${BASE_DIR}"
+INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+case $PLATFORM in
+  Windows)
+    SOURCE_FORMAT=7z
+    SOURCE_URL=https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.0/wxWidgets-3.1.0.7z
+    SZIP_OUTPUT_DIR=${BASE_DIR}
+
+    BUILD_METHOD=devenv
+    MSVC_CONFIG="DLL Release"
+    if [ ${ARCH} = "32-bit" ]; then
+      MSVC_PLATFORM=Win32
+      INSTALL_DIR_LIB=vc_dll
+    else
+      MSVC_PLATFORM=x64
+      INSTALL_DIR_LIB=vc_x64_dll
+    fi
+    if (( "${VS_VERSION/.*}" > 14 )); then
+      PREBUILD_METHOD=devenv
+      MSVC_SOLUTION=( "${SOURCE_DIR}/build/msw/wx_vc14.sln" )
+    else
+      SKIP_PREBUILD=yes
+      MSVC_SOLUTION=( "${SOURCE_DIR}/build/msw/wx_vc${VS_VERSION/.*}.sln" )
+    fi
+
+    POST_BUILD_METHOD+=( "mkdir -p ${INSTALL_DIR}/lib" )
+    POST_BUILD_METHOD+=( "cp -R include ${INSTALL_DIR}/." )
+    POST_BUILD_METHOD+=( "cp -R lib/${INSTALL_DIR_LIB} ${INSTALL_DIR}/lib/." )
+    ;;
+  Darwin)
+    BUILD_TARGET="install"
+
+    PREBUILD_METHOD=configure
+    CONFIGURE=./configure
+    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --with-cxx=11 )
+    CONFIGURE_PARAMS+=( --with-osx )
+    ;;
+  Linux)
+    BUILD_TARGET="install"
+
+    PREBUILD_METHOD=configure
+    CONFIGURE=./configure
+    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( CXXFLAGS="-std=c++11" )
+    ;;
+esac

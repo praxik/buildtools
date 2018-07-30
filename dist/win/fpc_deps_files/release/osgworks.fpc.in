@@ -1,0 +1,15 @@
+prefix=${fp_file_cwd}/../..
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: osgWorks
+Description: osgWorks release pre-compiled for VES
+Provides: osgWorks osgworks
+Requires: openscenegraph openthreads
+Version: 2.0.2
+Libs: /libpath:"${libdir}" osgwControls.lib osgwMx.lib osgwTools.lib osgwQuery.lib
+Cflags: /I"${includedir}"
+Arch: noarch
+
+

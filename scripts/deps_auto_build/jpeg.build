@@ -1,0 +1,61 @@
+PACKAGE_NAME=jpeg
+
+SOURCE_RETRIEVAL_METHOD=wget
+
+case $PLATFORM in
+  Windows)
+    BASE_DIR="${DEV_BASE_DIR}/jpeg-9c"
+
+    SOURCE_URL=http://www.ijg.org/files/jpegsr9c.zip
+    SOURCE_FORMAT=zip
+
+    SOURCE_DIR="${BASE_DIR}"
+    BUILD_DIR="${BASE_DIR}/build-${ARCH}"
+    INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+    POST_RETRIEVAL_METHOD+=( "cp -R ${VES_SRC_DIR}/patches/jpeg/* ${SOURCE_DIR}" )
+    POST_RETRIEVAL_METHOD+=( "cp jconfig.vc jconfig.h" )
+    PREBUILD_METHOD=cmake
+    BUILD_METHOD=cmake
+
+    MSVC_CONFIG="${BUILD_TYPE}"
+    if [ ${ARCH} = "32-bit" ]; then
+      MSVC_PLATFORM=Win32
+    else
+      MSVC_PLATFORM=x64
+    fi
+    MSVC_SOLUTION=( "jpeg.sln" )
+
+    CMAKE_PARAMS+=( -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" )
+    ;;
+  Darwin)
+    BASE_DIR="${DEV_BASE_DIR}/jpeg-6b"
+
+    SOURCE_URL=http://www.ijg.org/files/jpegsrc.v9b.tar.gz
+    SOURCE_URL=http://www.ijg.org/files/jpegsrc.v6b.tar.gz
+    SOURCE_FORMAT=tgz
+
+    SOURCE_DIR="${BASE_DIR}"
+    BUILD_DIR="${BASE_DIR}/build-${ARCH}"
+    INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+    PREBUILD_METHOD=configure
+    CONFIGURE=../configure
+    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    POST_BUILD_METHOD=( "cd ${SOURCE_DIR}" )
+    POST_BUILD_METHOD+=( "mkdir ${INSTALL_DIR}" )
+    POST_BUILD_METHOD+=( "mkdir ${INSTALL_DIR}/bin" )
+    POST_BUILD_METHOD+=( "mkdir ${INSTALL_DIR}/man" )
+    POST_BUILD_METHOD+=( "mkdir ${INSTALL_DIR}/man/man1" )
+    POST_BUILD_METHOD+=( "mkdir ${INSTALL_DIR}/include" )
+    POST_BUILD_METHOD+=( "mkdir ${INSTALL_DIR}/lib" )
+    POST_BUILD_METHOD+=( "cd ${SOURCE_DIR}" )
+    POST_BUILD_METHOD+=( "cp *.h ${INSTALL_DIR}/include" )
+    POST_BUILD_METHOD+=( "cd ${BUILD_DIR}" )
+    POST_BUILD_METHOD+=( "cp *.h ${INSTALL_DIR}/include" )
+    POST_BUILD_METHOD+=( "cp *.a ${INSTALL_DIR}/lib" )
+    POST_BUILD_METHOD+=( "make install" )
+    ;;
+  Linux)
+    ;;
+esac

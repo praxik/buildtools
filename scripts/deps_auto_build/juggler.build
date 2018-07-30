@@ -1,0 +1,106 @@
+PACKAGE_NAME=JUGGLER
+BASE_DIR="${DEV_BASE_DIR}/vrjuggler-trunk"
+
+SOURCE_RETRIEVAL_METHOD=git
+SOURCE_URL=https://github.com/vrjuggler/vrjuggler.git
+
+SOURCE_DIR="${BASE_DIR}"
+BUILD_DIR="${BASE_DIR}/build-${ARCH}"
+INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+if [ -d "${INSTALL_DIR}"/lib64 ]
+then
+    VES_INSTALL_PARAMS+=( lib64 )
+else
+    VES_INSTALL_PARAMS+=( lib )
+fi
+
+VES_INSTALL_PARAMS+=( bin )
+VES_INSTALL_PARAMS+=( share )
+
+case $PLATFORM in
+  Windows)
+    #unset PROJ_STR
+    #unset BUILD_TARGET
+
+    PREBUILD_METHOD=custom
+
+    # generate an options file for use with build_windows.py
+    OPTIONS_FILE="./ves-vrj-build-options"
+
+    CUSTOM_PREBUILD+=( "if [ -f ${OPTIONS_FILE} ]; then rm ${OPTIONS_FILE}; fi;" )
+    CUSTOM_PREBUILD+=( "echo \"options['BOOST_ROOT'] = r'\$(cygpath -w ${BOOST_INSTALL_DIR})'\" >> ${OPTIONS_FILE};" )
+    CUSTOM_PREBUILD+=( "echo \"options['BOOST_VERSION'] = r'${BOOST_VERSION}'\" >> ${OPTIONS_FILE};" )
+    CUSTOM_PREBUILD+=( "echo \"options['CPPDOM_ROOT'] = r'\$(cygpath -w ${CPPDOM_INSTALL_DIR})'\" >> ${OPTIONS_FILE};" )
+    CUSTOM_PREBUILD+=( "echo \"options['GMTL_ROOT'] = r'\$(cygpath -w ${GMTL_INSTALL_DIR})'\" >> ${OPTIONS_FILE};" )
+    CUSTOM_PREBUILD+=( "echo \"options['SDL_ROOT'] = r'\$(cygpath -w ${SDL_INSTALL_DIR})'\" >> ${OPTIONS_FILE};" )
+    CUSTOM_PREBUILD+=( "echo \"options['prefix'] = r'\$(cygpath -w ${INSTALL_DIR})'\" >> ${OPTIONS_FILE};" )
+    CUSTOM_PREBUILD+=( "echo \"options['deps-prefix'] = r'\$(cygpath -w ${INSTALL_DIR})'\" >> ${OPTIONS_FILE};" )
+
+    BUILD_METHOD=custom
+
+    # Just assume that we have Python 2.7 installed in the default location
+    PYTHON_EXE=/cygdrive/c/Python27/python.exe
+
+    CUSTOM_BUILD+=( ${PYTHON_EXE} )
+    CUSTOM_BUILD+=( -i )
+    CUSTOM_BUILD+=( ./build_windows.py )
+    CUSTOM_BUILD+=( --build=ReleaseDLL )
+    CUSTOM_BUILD+=( --options-file=./ves-vrj-build-options )
+    CUSTOM_BUILD+=( -c )
+    CUSTOM_BUILD+=( -a )
+    CUSTOM_BUILD+=( --install )
+    CUSTOM_BUILD+=( --install-deps )
+
+    if [ ${ARCH} = "64-bit" ]; then
+      CUSTOM_BUILD+=( --64 )
+    fi
+    ;;
+  Darwin)
+    BUILD_TARGET="build install"
+    PREBUILD_METHOD=configure
+    CONFIGURE=../configure.pl
+    CONFIGURE_PARAMS+=( --with-boost="${BOOST_INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --with-boost-includes="${BOOST_INSTALL_DIR}/include" )
+    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --with-sdl="${SDL_INSTALL_DIR}" )
+
+    # VR Juggler's build system assumes that SDL libraries
+    # are in ${SDL_ROOT}/lib, but not all distros put them there
+    if [ -d "${SDL_INSTALL_DIR}"/lib64 ]
+    then
+        CONFIGURE_PARAMS+=( LDFLAGS="-L${SDL_INSTALL_DIR}/lib64" )
+        LD_LIBRARY_PATH="${SDL_INSTALL_DIR}"/lib64
+    fi
+    export CXXFLAGS="-std=c++11 -stdlib=libc++"
+    export LDFLAGS="-stdlib=libc++"
+    export LD_LIBRARY_PATH=${BUILD_DIR}/instlinks/lib64:${LD_LIBRARY_PATH}
+    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${CPPDOM_INSTALL_DIR}/lib64
+    export FLAGPOLL_PATH=${FLAGPOLL_PATH}:${GMTL_TRUNK_INSTALL_DIR}/share/flagpoll
+    export ACLOCAL_FLAGS="-I $FLAGPOLL_INSTALL_DIR/share/aclocal"
+    export PATH=${PATH}:${FLAGPOLL_INSTALL_DIR}/bin
+    ;;
+  Linux)
+    BUILD_TARGET="build install"
+    PREBUILD_METHOD=configure
+    CONFIGURE=../configure.pl
+    CONFIGURE_PARAMS+=( --with-boost="${BOOST_INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --with-boost-includes="${BOOST_INSTALL_DIR}/include" )
+    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --with-sdl="${SDL_INSTALL_DIR}" )
+    
+    # VR Juggler's build system assumes that SDL libraries
+    # are in ${SDL_ROOT}/lib, but not all distros put them there
+    if [ -n "${SDL_INSTALL_DIR}" ] && [ -d "${SDL_INSTALL_DIR}"/lib64 ];
+    then
+        CONFIGURE_PARAMS+=( LDFLAGS="-L${SDL_INSTALL_DIR}/lib64" )
+        LD_LIBRARY_PATH="${SDL_INSTALL_DIR}"/lib64:${LD_LIBRARY_PATH}
+    fi
+    export LD_LIBRARY_PATH=${BUILD_DIR}/instlinks/lib64:${LD_LIBRARY_PATH}
+    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${CPPDOM_INSTALL_DIR}/lib64
+    export FLAGPOLL_PATH=${FLAGPOLL_PATH}:${GMTL_TRUNK_INSTALL_DIR}/share/flagpoll
+    export ACLOCAL_FLAGS="-I $FLAGPOLL_INSTALL_DIR/share/aclocal"
+    export PATH=${PATH}:${FLAGPOLL_INSTALL_DIR}/bin
+    ;;
+esac
+

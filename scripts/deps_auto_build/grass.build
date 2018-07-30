@@ -1,0 +1,63 @@
+PACKAGE_NAME=grass
+BASE_DIR="${DEV_BASE_DIR}/grass-7.0.0beta1"
+
+SOURCE_RETRIEVAL_METHOD=wget
+SOURCE_URL=http://grass.osgeo.org/grass70/source/grass-7.0.0beta1.tar.gz
+SOURCE_FORMAT=tgz
+
+SOURCE_DIR="${BASE_DIR}"
+BUILD_DIR="${BASE_DIR}"
+INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+case $PLATFORM in
+  Windows)
+    unset PROJ_STR
+    unset BUILD_TARGET
+    SOURCE_URL=http://vesuite.org/external/deps/non-admin/win-x86/msvc_11.0/gdal-1.10.1.zip
+    SOURCE_FORMAT=zip
+    SOURCE_DIR="${BASE_DIR}"
+    BUILD_DIR="${BASE_DIR}"
+    INSTALL_DIR="${BASE_DIR}"
+    ;;
+  Darwin)
+    PREBUILD_METHOD=configure
+    CONFIGURE=./configure
+    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --with-proj-libs="${proj_INSTALL_DIR}/lib" )
+    CONFIGURE_PARAMS+=( --with-proj-includes="${proj_INSTALL_DIR}/include" )
+    CONFIGURE_PARAMS+=( --with-proj-share="${proj_INSTALL_DIR}/share/proj" )
+    CONFIGURE_PARAMS+=( --with-gdal="${gdal_INSTALL_DIR}/bin/gdal-config" )
+    CONFIGURE_PARAMS+=( --with-pthread )
+    CONFIGURE_PARAMS+=( --with-opengl=no )
+    CONFIGURE_PARAMS+=( --with-freetype=no )
+    CONFIGURE_PARAMS+=( --with-tiff-includes="${tiff_INSTALL_DIR}/include" )
+    CONFIGURE_PARAMS+=( --with-tiff-libs="${tiff_INSTALL_DIR}/lib" )
+    CONFIGURE_PARAMS+=( --with-png-includes="${PNG_INSTALL_DIR}/include" )
+    CONFIGURE_PARAMS+=( --with-png-libs="${PNG_INSTALL_DIR}/lib" )
+    CONFIGURE_PARAMS+=( --with-fftw-includes="${fftw_INSTALL_DIR}/include" )
+    CONFIGURE_PARAMS+=( --with-fftw-libs="${fftw_INSTALL_DIR}/lib" )
+    #CONFIGURE_PARAMS+=( --with-geos="${geos_INSTALL_DIR}/bin/geos-config" )
+
+    CONFIGURE_PARAMS+=( --with-freetype-includes="${freetype_INSTALL_DIR}/include/freetype2" )
+    export PATH=${PATH}:${proj_INSTALL_DIR}/bin
+    export CFLAGS="-I${freetype_INSTALL_DIR}/include"
+    export CXXFLAGS="-std=c++11 -stdlib=libc++"
+    export LDFLAGS="-stdlib=libc++"
+    export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:${cairo_INSTALL_DIR}/lib/pkgconfig
+    export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:${pixman_INSTALL_DIR}/lib/pkgconfig
+    export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:${freetype_INSTALL_DIR}/lib/pkgconfig
+    export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:${PNG_INSTALL_DIR}/lib/pkgconfig
+    unset BUILD_TARGET
+    POST_BUILD_METHOD="make install"
+    ;;
+  Linux)
+    PREBUILD_METHOD=configure
+    CONFIGURE=./configure
+    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --with-threads=-lpthread )
+    CONFIGURE_PARAMS+=( --with-geotiff=internal )
+    CONFIGURE_PARAMS+=( --with-static-proj4="${proj_INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --with-expat-lib=/usr/lib64/libexpat.so )
+    CONFIGURE_PARAMS+=( LDFLAGS="-L/usr/lib64 -lexpat" )
+    ;;
+esac

@@ -1,0 +1,58 @@
+
+###############################################################################
+# Check version of Visual C++ compiler:
+# nmake -f makefile.vc MSVC_VER=xxxx
+# where xxxx is one of following:
+# 1700 = 11.0(2012)
+# 1600 = 10.0(2010)
+# 1500 = 9.0 (2008)
+# 1400 = 8.0 (2005) - specific compilation flags, different from older VC++
+# 1310 = 7.1 (2003)
+# 1300 = 7.0 (2002)
+# 1200 = 6.0
+#
+!IFNDEF MSVC_VER
+#assume msvc VS2008.
+MSVC_VER=1700
+!ENDIF
+
+!IFNDEF GDAL_HOME
+GDAL_HOME = "C:\dev\gdal-1.10.1\install-64-bit"
+!ENDIF
+
+# Uncomment the following if you are building for 64-bit windows
+# (x64). You'll need to have PATH, INCLUDE and LIB set up for 64-bit
+# compiles.
+WIN64=YES
+
+# Version number embedded in DLL name. 
+!IFNDEF VERSION
+VERSION =	110
+!ENDIF
+
+# Uncomment for Xerces based GML and ILI support.
+XERCES_DIR =C:\dev\xerces-c-3.1.1\install-64-bit
+XERCES_INCLUDE = -I$(XERCES_DIR)/include -I$(XERCES_DIR)/include/xercesc
+XERCES_LIB = $(XERCES_DIR)/lib/xerces-c_3.lib
+
+# PROJ.4 stuff
+# Uncomment the following lines to link PROJ.4 library statically. Otherwise
+# it will be linked dynamically during runtime.
+PROJ_FLAGS = -DPROJ_STATIC
+PROJ_INCLUDE = -IC:\dev\proj-4.8.0\install-64-bit\include
+PROJ_LIBRARY = C:\dev\proj-4.8.0\install-64-bit\lib\proj.lib
+
+# Uncomment to use libcurl (DLL by default)
+# The cURL library is used for WCS, WMS, GeoJSON, SRS call importFromUrl(), WFS, GFT, CouchDB, /vsicurl/ etc.
+CURL_DIR=C:\dev\curl-7.21.4\install-64-bit
+CURL_INC = -I$(CURL_DIR)/include
+# Uncoment following line to use libcurl as dynamic library
+#CURL_LIB = $(CURL_DIR)/lib/libcurl_imp.lib wsock32.lib wldap32.lib winmm.lib
+# Uncoment following two lines to use libcurl as static library
+CURL_LIB = $(CURL_DIR)/lib/libcurl_imp.lib wsock32.lib wldap32.lib winmm.lib
+CURL_CFLAGS = -DCURL_STATICLIB
+
+# Uncomment for GEOS support
+GEOS_DIR=C:/dev/geos-3.4.2/install-64-bit
+GEOS_CFLAGS = -I$(GEOS_DIR)/include -DHAVE_GEOS
+GEOS_LIB     = $(GEOS_DIR)/lib/geos_c.lib

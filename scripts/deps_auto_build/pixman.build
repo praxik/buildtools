@@ -1,0 +1,37 @@
+PACKAGE_NAME=pixman
+BASE_DIR="${DEV_BASE_DIR}/pixman-0.34.0"
+
+SOURCE_RETRIEVAL_METHOD=wget
+SOURCE_URL=http://cairographics.org/releases/pixman-0.34.0.tar.gz
+SOURCE_FORMAT=tgz
+
+SOURCE_DIR="${BASE_DIR}"
+BUILD_DIR="${BASE_DIR}/build-${ARCH}"
+INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+case $PLATFORM in
+  Windows)
+    POST_RETRIEVAL_METHOD+=( "sed -i '/-C test/d' ${SOURCE_DIR}/Makefile.win32" )
+
+    BUILD_DIR="${BASE_DIR}"
+    BUILD_METHOD=make
+    CFG=release
+    MAKE_ARGS+=( "-f Makefile.win32 CFG=${CFG}" )
+    MAKE_ARGS+=( "MMX=off" )
+
+    POST_BUILD_METHOD+=( "mkdir -p ${INSTALL_DIR}/include" )
+    POST_BUILD_METHOD+=( "mkdir -p ${INSTALL_DIR}/lib" )
+    POST_BUILD_METHOD+=( "cp pixman/pixman.h pixman/pixman-version.h ${INSTALL_DIR}/include" )
+    POST_BUILD_METHOD+=( "cp pixman/${CFG}/*.lib ${INSTALL_DIR}/lib" )
+    ;;
+  Darwin)
+    PREBUILD_METHOD=configure
+    CONFIGURE=../configure
+    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    ;;
+  Linux)
+    PREBUILD_METHOD=configure
+    CONFIGURE=../configure
+    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    ;;
+esac

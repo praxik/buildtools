@@ -1,0 +1,87 @@
+#!/bin/bash
+
+#$XKB_BINDIR/xkbcomp -w 1 -R$XKBDIR -xkm "default.xkm" "/tmp/server-99.xkm"
+
+###
+function usage()
+{
+  echo "
+    usage: $0 [ options ] <xkmpath> ....
+
+    OPTIONS:
+      -h|help Print this message
+      -w      Set warning level (0=non, 10=all)
+      -R      Specifies the root directory for
+              relative path names
+      -x|xkm  Create a compiled key map (.xkm) file" >&2
+}
+
+#Transform long options to short ones
+for arg in "$@"; do
+  shift
+  case "$arg" in
+    "-help")
+      set -- "$@" "-h"
+      ;;
+    "-xkm")
+      set -- "$@" "-x"
+      ;;
+    "-em1")
+      set -- "$@" "-e"
+      ;;
+    "-emp")
+      set -- "$@" "-p"
+      ;;
+    "-eml")
+      set -- "$@" "-l"
+      ;;
+    *)
+      set -- "$@" "$arg"
+  esac
+done
+
+###
+while getopts "hw:R:x:e:p:l:" opts
+do
+case $opts in
+  h)
+    usage
+    ;;
+  w)
+    warning=$OPTARG
+    ;;
+  R)
+    root=$OPTARG
+    ;;
+  x)
+    xkm=$OPTARG
+    ;;
+  e)
+    ;;
+  p)
+    ;;
+  l)
+    ;;
+  ?)
+    echo "Invalid option: $OPTARG" >&2
+    usage
+    kill -SIGINT $$
+    ;;
+  :)
+    echo "Option $OPTARG requires an argument." >&2
+    usage
+    kill -SIGINT $$
+    ;;
+  *)
+    usage
+    ;;
+esac
+done
+shift $(($OPTIND - 1))
+
+###
+input="${root}/${xkm}"
+output="${!#}"
+cp $input $output
+
+exit 0

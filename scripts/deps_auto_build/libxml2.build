@@ -1,0 +1,28 @@
+PACKAGE_NAME=libxml2
+
+SOURCE_RETRIEVAL_METHOD=wget
+
+case $PLATFORM in
+  Windows)
+    BASE_DIR="${DEV_BASE_DIR}/libxml2-2.9.7"
+
+    SOURCE_URL=ftp://xmlsoft.org/libxml2/libxml2-2.9.7.tar.gz
+    SOURCE_FORMAT=tgz
+
+    SOURCE_DIR="${BASE_DIR}"
+    BUILD_DIR="${BASE_DIR}/win32"
+    INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+    PREBUILD_METHOD=custom
+    CUSTOM_PREBUILD=( "cd ${BUILD_DIR}" )
+    CUSTOM_PREBUILD+=( "cscript configure.js compiler=msvc debug=no static=yes iconv=no icu=no prefix=${INSTALL_DIR//\//\\\\}" )
+
+    BUILD_METHOD=nmake
+    NMAKE_ARGS=( "/f Makefile.msvc" )
+    NMAKE_INST_ARG="install"
+    ;;
+  Darwin)
+    ;;
+  Linux)
+    ;;
+esac

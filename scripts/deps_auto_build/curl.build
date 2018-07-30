@@ -1,0 +1,49 @@
+PACKAGE_NAME=curl
+BASE_DIR="${DEV_BASE_DIR}/curl-7.57.0"
+
+SOURCE_RETRIEVAL_METHOD=wget
+SOURCE_URL=http://curl.haxx.se/download/curl-7.57.0.tar.gz
+SOURCE_FORMAT=tgz
+
+SOURCE_DIR="${BASE_DIR}"
+BUILD_DIR="${BASE_DIR}/build-${ARCH}"
+INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+case $PLATFORM in
+  Windows)
+    PREBUILD_METHOD=cmake
+    BUILD_METHOD=cmake
+
+    MSVC_CONFIG="${BUILD_TYPE}"
+    if [ "$ARCH" = "64-bit" ]; then
+      MSVC_PLATFORM=x64
+    else
+      MSVC_PLATFORM=Win32
+    fi
+    MSVC_SOLUTION=( "CURL.sln" )
+
+    CMAKE_PARAMS+=( -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" )
+    CMAKE_PARAMS+=( -DCMAKE_CONFIGURATION_TYPES="${BUILD_TYPE}" )
+    CMAKE_PARAMS+=( -DBUILD_TESTING=NO )
+    CMAKE_PARAMS+=( -DBUILD_CURL_EXE=NO )
+    CMAKE_PARAMS+=( -DCURL_ZLIB=OFF )
+
+    CMAKE_PARAMS+=( -DCMAKE_USE_OPENSSL=ON )
+    CMAKE_PARAMS+=( -DOPENSSL_ROOT_DIR="${OPENSSL_INSTALL_DIR}" )
+    CMAKE_PARAMS+=( -DOPENSSL_INCLUDE_DIR="${OPENSSL_INSTALL_DIR}/include" )
+    CMAKE_PARAMS+=( -DSSL_EAY_RELEASE="${OPENSSL_INSTALL_DIR}/lib/libeay32.lib" )
+    CMAKE_PARAMS+=( -DLIB_EAY_RELEASE="${OPENSSL_INSTALL_DIR}/lib/ssleay32.lib" )
+
+    #POST_BUILD_METHOD+=( "cp ${BUILD_DIR}/lib/curl_config.h ${INSTALL_DIR}/include/curl/." )
+    ;;
+  Darwin)
+    PREBUILD_METHOD=configure
+    CONFIGURE=../configure
+    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    ;;
+  Linux)
+    PREBUILD_METHOD=configure
+    CONFIGURE=../configure
+    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    ;;
+esac

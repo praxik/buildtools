@@ -1,0 +1,43 @@
+PACKAGE_NAME=ledaps
+BASE_DIR="${DEV_BASE_DIR}/ledaps-2.2.1"
+
+SOURCE_RETRIEVAL_METHOD=svn
+SOURCE_URL=http://ledaps.googlecode.com/svn/releases/version_2.2.1
+
+SOURCE_DIR="${BASE_DIR}"
+BUILD_DIR="${BASE_DIR}/build-${ARCH}"
+INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+POST_RETRIEVAL_METHOD=( "cp -R ${VES_SRC_DIR}/patches/ledaps/* ${SOURCE_DIR}" )
+
+PREBUILD_METHOD=cmake
+BUILD_METHOD=cmake
+
+CMAKE_PARAMS+=( -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" )
+CMAKE_PARAMS+=( -DESPA_DIR="${espa_INSTALL_DIR}/lib/cmake" )
+
+case $PLATFORM in
+  Windows)
+    MSVC_CONFIG="${BUILD_TYPE}"
+    if [ ${ARCH} = "32-bit" ]; then
+      MSVC_PLATFORM=Win32
+    else
+      MSVC_PLATFORM=x64
+    fi
+    MSVC_SOLUTION=( "ledaps.sln" )
+
+    CMAKE_PARAMS+=( -DGeoTIFF_DIR="${libgeotiff_INSTALL_DIR}/cmake" )
+    CMAKE_PARAMS+=( -DHDF4_DIR="${hdf_INSTALL_DIR}/cmake/hdf4" )
+    CMAKE_PARAMS+=( -Dhdf-eos2_DIR="${hdfeos_INSTALL_DIR}/cmake/hdf-eos2" )
+    CMAKE_PARAMS+=( -DMINGW_GFORTRAN="${mingw_INSTALL_DIR}/bin/gfortran.exe" )
+    CMAKE_PARAMS+=( -DPC_LIBXML_INCLUDEDIR="${libxml2_INSTALL_DIR}/include" )
+    CMAKE_PARAMS+=( -DPC_LIBXML_LIBDIR="${libxml2_INSTALL_DIR}/lib" )
+    ;;
+  Darwin)
+    ;;
+  Linux)
+    CMAKE_PARAMS+=( -DGeoTIFF_DIR="${libgeotiff_INSTALL_DIR}/share/cmake/GeoTIFF" )
+    CMAKE_PARAMS+=( -DHDF4_DIR="${hdf_INSTALL_DIR}/share/cmake/hdf4" )
+    CMAKE_PARAMS+=( -Dhdf-eos2_DIR="${hdfeos_INSTALL_DIR}/share/cmake/hdf-eos2" )
+    ;;
+esac

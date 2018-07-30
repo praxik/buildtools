@@ -1,0 +1,11 @@
+Don't install dev deps in the default location in cygwin. Specify an absolute path. The default location confuses CMAKE
+
+subversion
+wget
+unzip
+
+Setting file permissions in Cygwin:
+http://www.cygwin.com/cygwin-ug-net/ntsec.html
+
+This worked for me; edit /etc/fstab with the line:
+none /cygdrive cygdrive override,binary,noacl 0 0

@@ -1,0 +1,38 @@
+PACKAGE_NAME=harfbuzz
+BASE_DIR="${DEV_BASE_DIR}/harfbuzz-1.7.5"
+
+SOURCE_RETRIEVAL_METHOD=wget
+SOURCE_FORMAT=bz2
+SOURCE_URL=https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-1.7.5.tar.bz2
+
+SOURCE_DIR="${BASE_DIR}"
+BUILD_DIR="${BASE_DIR}/build-${ARCH}"
+INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+PREBUILD_METHOD=cmake
+BUILD_METHOD=cmake
+
+CMAKE_PARAMS+=( -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" )
+
+case $PLATFORM in
+  Windows)
+    MSVC_CONFIG="${BUILD_TYPE}"
+    if [ ${ARCH} = "32-bit" ]; then
+      MSVC_PLATFORM=Win32
+    else
+      MSVC_PLATFORM=x64
+    fi
+    MSVC_SOLUTION="harfbuzz.sln"
+
+    CMAKE_PARAMS+=( -DCMAKE_CONFIGURATION_TYPES="${BUILD_TYPE}" )
+    CMAKE_PARAMS+=( -DBUILD_SHARED_LIBS=OFF )
+    CMAKE_PARAMS+=( -DHB_HAVE_FREETYPE=ON )
+    CMAKE_PARAMS+=( -DFREETYPE_INCLUDE_DIR_freetype2="${freetype_INSTALL_DIR}/include/freetype2" )
+    CMAKE_PARAMS+=( -DFREETYPE_INCLUDE_DIR_ft2build="${freetype_INSTALL_DIR}/include" )
+    CMAKE_PARAMS+=( -DFREETYPE_LIBRARY="${freetype_INSTALL_DIR}/lib/freetype.lib" )
+    ;;
+  Darwin)
+    ;;
+  Linux)
+    ;;
+esac

@@ -1,0 +1,46 @@
+PACKAGE_NAME=ICU
+BASE_DIR="${DEV_BASE_DIR}/icu"
+
+SOURCE_RETRIEVAL_METHOD=wget
+SOURCE_FORMAT=tgz
+SOURCE_URL=http://download.icu-project.org/files/icu4c/62.1/icu4c-62_1-src.tgz
+
+SOURCE_DIR="${BASE_DIR}"
+BUILD_DIR="${BASE_DIR}/build-${ARCH}"
+INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+VES_INSTALL_PARAMS+=( lib )
+
+case $PLATFORM in
+  Windows)
+    BUILD_METHOD=devenv
+    MSVC_CONFIG="${BUILD_TYPE}"
+    if [ ${ARCH} = "32-bit" ]; then
+      MSVC_PLATFORM=Win32
+      INSTALL_DIR_BIN=bin
+      INSTALL_DIR_LIB=lib
+    else
+      MSVC_PLATFORM=x64
+      INSTALL_DIR_BIN=bin64
+      INSTALL_DIR_LIB=lib64
+    fi
+    MSVC_SOLUTION=( "${SOURCE_DIR}/source/allinone/allinone.sln" )
+
+    if (( "${VS_VERSION/.*}" > 14 )); then
+      PREBUILD_METHOD=devenv
+    fi
+
+    POST_BUILD_METHOD=( "mkdir -p ${INSTALL_DIR}" )
+    POST_BUILD_METHOD+=( "cp -R ../include ${INSTALL_DIR}" )
+    POST_BUILD_METHOD+=( "cp -R -T ../${INSTALL_DIR_BIN} ${INSTALL_DIR}/bin" )
+    POST_BUILD_METHOD+=( "cp -R -T ../${INSTALL_DIR_LIB} ${INSTALL_DIR}/lib" )
+    ;;
+  Darwin | Linux)
+    POST_RETRIEVAL_METHOD="chmod +x ./source/runConfigureICU ./source/configure ./source/install-sh"
+    PREBUILD_METHOD=configure
+    CONFIGURE=../source/configure
+    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --enable-static=yes )
+    CONFIGURE_PARAMS+=( --enable-shared=no )
+    ;;
+esac

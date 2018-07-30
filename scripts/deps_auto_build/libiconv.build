@@ -1,0 +1,47 @@
+PACKAGE_NAME=libiconv
+
+SOURCE_RETRIEVAL_METHOD=wget
+
+case $PLATFORM in
+  Windows)
+    BASE_DIR="${DEV_BASE_DIR}/libiconv-1.11.1"
+
+    SOURCE_URL=http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.11.1.tar.gz
+    SOURCE_FORMAT=tgz
+
+    SOURCE_DIR="${BASE_DIR}"
+    BUILD_DIR="${BASE_DIR}"
+    INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+    POST_RETRIEVAL_METHOD=( "cp ${VES_SRC_DIR}/patches/libiconv/* ${SOURCE_DIR}/windows" )
+
+    BUILD_METHOD=nmake
+    NMAKE_ARGS=( "/f Makefile.msvc" )
+    NMAKE_ARGS+=( "NO_NLS=\"1\"" )
+    NMAKE_ARGS+=( "DLL=\"0\"" )
+    #NMAKE_ARGS+=( "MFLAGS=\"/MD /Oi\"" )
+    NMAKE_ARGS+=( "PREFIX=\"${INSTALL_DIR//\//\\\\}\"" )
+    if [ ${ARCH} = "64-bit" ]; then
+      NMAKE_ARGS+=( "WIN64=\"YES\"" )
+    fi
+    NMAKE_INST_ARG="install"
+    ;;
+  Darwin)
+    BASE_DIR="${DEV_BASE_DIR}/libiconv-1.15"
+
+    SOURCE_URL=https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz
+    SOURCE_FORMAT=tgz
+
+    SOURCE_DIR="${BASE_DIR}"
+    BUILD_DIR="${BASE_DIR}"
+    INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+    PREBUILD_METHOD=configure
+    CONFIGURE=./configure
+    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --enable-static=yes )
+    CONFIGURE_PARAMS+=( --enable-shared=no )
+    ;;
+  Linux)
+    ;;
+esac

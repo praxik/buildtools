@@ -1,0 +1,16 @@
+PACKAGE_NAME=FLAGPOLL
+BASE_DIR="${DEV_BASE_DIR}/flagpoll-0.9.4"
+
+SOURCE_RETRIEVAL_METHOD=git
+SOURCE_URL=https://github.com/mccdo/flagpoll.git
+
+SOURCE_DIR="${BASE_DIR}"
+BUILD_DIR="${BASE_DIR}/build-${ARCH}"
+INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+case $PLATFORM in
+  Windows|Darwin|Linux)
+    unset PROJ_STR
+    unset BUILD_TARGET
+    ;;
+esac

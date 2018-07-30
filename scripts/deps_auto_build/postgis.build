@@ -1,0 +1,34 @@
+PACKAGE_NAME=postgis
+BASE_DIR="${DEV_BASE_DIR}/postgis-2.3.7"
+
+SOURCE_RETRIEVAL_METHOD=wget
+SOURCE_URL=http://download.osgeo.org/postgis/source/postgis-2.3.7.tar.gz
+SOURCE_FORMAT=tgz
+
+SOURCE_DIR="${BASE_DIR}"
+BUILD_DIR="${BASE_DIR}"
+INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+
+case $PLATFORM in
+  Windows)
+    ;;
+  Darwin)
+    PREBUILD_METHOD=configure
+    CONFIGURE=../configure
+    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --with-projdir="${proj_INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --with-geosconfig="${gdal_INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --with-gdalconfig="${geos_INSTALL_DIR}" )
+    ;;
+  Linux)
+    PREBUILD_METHOD=configure
+    CONFIGURE=./configure
+    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --with-projdir="${proj_INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --with-geosconfig="${geos_INSTALL_DIR}/bin/geos-config" )
+    CONFIGURE_PARAMS+=( --with-gdalconfig="${gdal_INSTALL_DIR}/bin/gdal-config" )
+    CONFIGURE_PARAMS+=( LDFLAGS="-L${filegdbsdk_INSTALL_DIR}/lib -L${gdal_INSTALL_DIR}/lib -L${geos_INSTALL_DIR}/lib -L${proj_INSTALL_DIR}/lib -lcurl -lxml2 -lgeos_c -lproj -lFileGDBAPI -lfgdbunixrtl" )
+    #CONFIGURE_PARAMS+=( --without-raster )
+    CONFIGURE_PARAMS+=( --without-topology )
+    ;;
+esac
