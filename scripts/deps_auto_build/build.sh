@@ -389,12 +389,32 @@ function unsetvars()
 }
 
 #
+# set the list of build files to consider
+#
+function buildfiles()
+{
+  declare -gA BUILD_FILES
+  for file in *.build; do
+    key=$( basename "${file}" )
+    BUILD_FILES[ "${key}" ]+="${file}"
+  done
+
+  [ $PLATFORM = "Windows" ] && BUILD_FILES_PATH=$( cygpath -u "${BUILD_FILES_PATH}" )
+  if [ -d "${BUILD_FILES_PATH}" ]; then
+    for file in "${BUILD_FILES_PATH}"/*.build; do
+      key=$( basename "${file}" )
+      BUILD_FILES[ "${key}" ]+="${file}"
+    done
+  fi
+}
+
+#
 # search all build files
 #
 function findvaliddeps()
 {
     echo "Preparing to install valid dependencies."
-    validatedeps *.build
+    validatedeps "${BUILD_FILES[@]}"
     echo "Done installing valid dependencies."
 }
 
@@ -589,9 +609,10 @@ function source_retrieval()
 function e()
 {
   package=$1
+  script="${BUILD_FILES[ "${package}" ]}"
 
   #is this option really a package
-  if [ ! -e "$package" ]; then
+  if [ ! -e "$script" ]; then
     echo "$package is not a package.";
     return;
   fi
@@ -616,7 +637,7 @@ function e()
   esac
 
   #setup the package specific vars
-  . $package
+  . $script
 
   #
   # check to make sure that the base dir is defined for the package
@@ -1063,6 +1084,7 @@ platform
 arch
 windows
 wget
+buildfiles
 
 [ -z "${DEPS_INSTALL_DIR}" ] && export DEPS_INSTALL_DIR="${HOME}/dev/deps/install-${PLATFORM}"
 if [ "${install_valid_deps}" = "yes" ] ; then
@@ -1105,7 +1127,7 @@ if [ "${build_auto_installer}" = "yes" ] ; then
   # just pass in an arbitrary package to make e() happy
   e osg.build
 else
-  export_config_vars *.build
+  export_config_vars "${BUILD_FILES[@]}"
 
   test "${PLATFORM}" == "Linux" && PATH=${java_INSTALL_DIR}/bin:${swig_INSTALL_DIR}/bin:${PATH};
   for p in $@; do
