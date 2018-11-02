@@ -1,8 +1,8 @@
-PACKAGE_NAME=lwgeom
-BASE_DIR="${DEV_BASE_DIR}/lwgeom"
+PACKAGE_NAME=lwgeomutils
+BASE_DIR="${DEV_BASE_DIR}/lwgeom-utils"
 
 SOURCE_RETRIEVAL_METHOD=git
-SOURCE_URL=https://github.com/jbkoch7/lwgeom.git
+SOURCE_URL=https://github.com/jbkoch7/lwgeom-utils.git
 GIT_BRANCH_VERSION=master
 
 SOURCE_DIR="${BASE_DIR}"
@@ -14,6 +14,8 @@ BUILD_METHOD=cmake
 
 CMAKE_PARAMS+=( -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" )
 CMAKE_PARAMS+=( -DBUILD_SHARED_LIBS=OFF )
+CMAKE_PARAMS+=( -DLWGEOM_DIR="${lwgeom_INSTALL_DIR}" )
+CMAKE_PARAMS+=( -DLWGEOM_USE_STATIC_LIBS=ON )
 CMAKE_PARAMS+=( -DGEOS_DIR="${geos_INSTALL_DIR}" )
 CMAKE_PARAMS+=( -DGEOS_USE_STATIC_LIBS=OFF )
 CMAKE_PARAMS+=( -DPROJ_DIR="${proj_INSTALL_DIR}" )
@@ -29,7 +31,7 @@ case $PLATFORM in
     else
       MSVC_PLATFORM=x64
     fi
-    MSVC_SOLUTION=( "lwgeom.sln" )
+    MSVC_SOLUTION=( "lwgeom-utils.sln" )
     ;;
   Darwin)
     ;;
