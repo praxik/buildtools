@@ -9,15 +9,15 @@ SOURCE_DIR="${BASE_DIR}"
 BUILD_DIR="${BASE_DIR}/build-${ARCH}"
 INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
 
-PREBUILD_METHOD=cmake
-BUILD_METHOD=cmake
-
 CMAKE_PARAMS+=( -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" )
 
 POST_RETRIEVAL_METHOD=( "cp ${VES_SRC_DIR}/patches/geos/GenerateSourceGroups.cmake ${SOURCE_DIR}/cmake/modules" )
 
 case $PLATFORM in
   Windows)
+    PREBUILD_METHOD=cmake
+    BUILD_METHOD=cmake
+
     MSVC_CONFIG="${BUILD_TYPE}"
     if [ ${ARCH} = "32-bit" ]; then
       MSVC_PLATFORM=Win32
@@ -31,6 +31,8 @@ case $PLATFORM in
     CMAKE_PARAMS+=( -DGEOS_ENABLE_INLINE=OFF )
     ;;
   Darwin)
+    PREBUILD_METHOD=cmake
+    BUILD_METHOD=cmake
     CMAKE_PARAMS+=( -DCMAKE_CXX_FLAGS="-std=c++11 -stdlib=libc++" )
     CMAKE_PARAMS+=( -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" )
     CMAKE_PARAMS+=( -DGEOS_ENABLE_TESTS=OFF )
