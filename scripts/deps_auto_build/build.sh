@@ -1,5 +1,7 @@
 #!/bin/bash
-set -ex
+
+# Set to "set -ex" for debugging purposes
+#set -e
 
 if [ -z "${VES_SRC_DIR}" ]; then
   export VES_SRC_DIR=$PWD/../../
