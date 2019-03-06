@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set to "set -ex" for debugging purposes
-#set -e
+set -e
 
 if [ -z "${VES_SRC_DIR}" ]; then
   export VES_SRC_DIR=$PWD/../../
@@ -539,7 +539,7 @@ function source_retrieval()
       fi
       # Settings (proxy etc.) for wget can be edited using /etc/wgetrc
       echo "${WGET_METHOD}"
-      eval "${WGET_METHOD}" "${SOURCE_URL}" || exit
+      eval "${WGET_METHOD}" "${SOURCE_URL}"
       case ${SOURCE_FORMAT} in
         zip)
           if [ -n "${EXDIR:+x}" ]; then
@@ -793,9 +793,7 @@ function e()
           MSVC_PROJECT+=( "${BUILD_TARGET}" )
         fi
 
-        for name in "${MSVC_PROJECT[@]}"; do
-          PROJ_STR="$PROJ_STR$name$( [ "$name" != "${MSVC_PROJECT[@]: -1}" ] && echo ';' )"
-        done
+        PROJ_STR=$( IFS=';' ; printf "%s" "${MSVC_PROJECT[*]}" )
 
         if [ -z "${PROJ_STR}" ]; then
           "${MSBUILD}" "$MSVC_SOLUTION" "${MCMD}" \
@@ -818,10 +816,8 @@ function e()
               MSVC_PROJECT+=( "${BUILD_TARGET}" )
             fi
 
-            unset PROJ_STR
-            for name in "${MSVC_PROJECT[@]}"; do
-              PROJ_STR="$PROJ_STR$name$( [ "$name" != "${MSVC_PROJECT[@]: -1}" ] && echo ';' )"
-            done
+            PROJ_STR=$( IFS=';' ; printf "%s" "${MSVC_PROJECT[*]}" )
+
             #http://www.cmake.org/cmake/help/cmake-2-8-docs.html#opt:--builddir
             echo "Build Command: --build ${BUILD_DIR} -- $MSVC_SOLUTION /build $MSVC_CONFIG|$MSVC_PLATFORM /project $PROJ_STR"
             ${CMAKE} --build "${BUILD_DIR}" -- "$MSVC_SOLUTION" /build "$MSVC_CONFIG"'|'"$MSVC_PLATFORM" /project "$PROJ_STR"
@@ -909,9 +905,7 @@ function e()
       msbuild)
         cd "${BUILD_DIR}"
 
-        for name in "${MSVC_PROJECT[@]}"; do
-          PROJ_STR="$PROJ_STR${name}:Clean$( [ "$name" != "${MSVC_PROJECT[@]: -1}" ] && echo ';' )"
-        done
+        PROJ_STR=$( IFS=':Clean;' ; printf "%s" "${MSVC_PROJECT[*]}" )":Clean"
 
         "${MSBUILD}" "$MSVC_SOLUTION" /t:"$PROJ_STR" "${MCMD}" \
          /p:Configuration="$MSVC_CONFIG" /p:Platform="$MSVC_PLATFORM" \
