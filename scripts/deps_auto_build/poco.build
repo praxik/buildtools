@@ -67,7 +67,7 @@ case $PLATFORM in
     CONFIGURE_PARAMS+=( --no-tests )
     CONFIGURE_PARAMS+=( --no-samples )
     OMIT="Data/MySQL"
-    BUILD_ODBC=$( ldconfig -p | grep libodbc.so )
+    BUILD_ODBC=$( ldconfig -p | grep libodbc.so ) || :
     if [[ -z "$BUILD_ODBC" ]]; then
       OMIT+=",Data/ODBC"
     fi

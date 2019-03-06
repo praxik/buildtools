@@ -1,4 +1,5 @@
 #!/bin/bash
+set -ex
 
 if [ -z "${VES_SRC_DIR}" ]; then
   export VES_SRC_DIR=$PWD/../../
@@ -61,8 +62,8 @@ function platform()
         VCVARSALL_ARG=amd64
       fi
       echo "Building ${ARCH} on ${OS_ARCH}"
-      PLATFORM=Windows;
-      HOME=$USERPROFILE;
+      PLATFORM=Windows
+      HOME=$USERPROFILE
       REGROOT="/proc/registry"
       REGPATH="HKEY_LOCAL_MACHINE/SOFTWARE"
       ;;
@@ -83,7 +84,7 @@ function platform()
 function arch()
 {
   if [ $PLATFORM = "Darwin" ]; then
-    ARCH=64-bit;
+    ARCH=64-bit
   else
     [ -z "${ARCH}" ] && ARCH=`uname -m`
   fi
@@ -124,7 +125,7 @@ function wget()
 #
 function windows()
 {
-  if [ $PLATFORM != "Windows" ]; then return; fi;
+  if [ $PLATFORM != "Windows" ]; then return; fi
 
   if [ $OS_ARCH = "64-bit" ]; then
       REGROOT=${REGROOT}64
@@ -221,7 +222,7 @@ function windows()
     CL+=( "cl.exe ${TMPFILE}.c" )
     eval "${CL[@]}" >/dev/null 2>&1
     find . -type f -name "${TMPFILE}.*" -and -not -name "${TMPFILE}.exe" -delete
-  fi;
+  fi
   MSVC_VER="$( ./${TMPFILE}.exe )"
   echo "Using Visual C++ compiler version: ${MSVC_VER}"
 }
@@ -431,7 +432,7 @@ function validatedeps()
         case $PLATFORM in
           Windows )
             if [ -z "${ISS_FILENAME}" ]; then echo "ISS_FILENAME undefined in package $package"; return; fi
-            innosetup;
+            innosetup
             ;;
           Darwin | Linux )
             echo "Installing ${INSTALL_DIR}/. to ${DEPS_INSTALL_DIR}"
@@ -480,11 +481,11 @@ function source_retrieval()
 {
   case ${SOURCE_RETRIEVAL_METHOD} in
     svn)
-      cd "${DEV_BASE_DIR}";
+      cd "${DEV_BASE_DIR}"
       SVN_CO="svn co"
 
       if [ -n "${SOURCE_REVISION:+x}" ]; then
-        SVN_CO="${SVN_CO} -r ${SOURCE_REVISION}";
+        SVN_CO="${SVN_CO} -r ${SOURCE_REVISION}"
         echo "using custom command ${SVN_CO}"
       fi
 
@@ -496,112 +497,112 @@ function source_retrieval()
       fi
       ;;
     hg)
-      cd "${DEV_BASE_DIR}";
-      hg clone ${SOURCE_URL} "${BASE_DIR}";
+      cd "${DEV_BASE_DIR}"
+      hg clone ${SOURCE_URL} "${BASE_DIR}"
       ;;
     git)
-      cd "${DEV_BASE_DIR}";
+      cd "${DEV_BASE_DIR}"
       if [ $PLATFORM = "Windows" ]; then
         #Replace "/" with "\" on Windows; this prevents the "C" directory from being created
-        git clone ${SOURCE_URL} "${BASE_DIR//\//\\}";
+        git clone ${SOURCE_URL} "${BASE_DIR//\//\\}"
       else
-        git clone ${SOURCE_URL} "${BASE_DIR}";
+        git clone ${SOURCE_URL} "${BASE_DIR}"
       fi
       if [ -n "${GIT_BRANCH_VERSION:+x}" ]; then
-        cd "${BASE_DIR}";
+        cd "${BASE_DIR}"
         git checkout -t origin/${GIT_BRANCH_VERSION}
         git pull
         echo "using custom command ${GIT_BRANCH_VERSION}"
       fi
       if [ -n "${GIT_HASH:+x}" ]; then
-        cd "${BASE_DIR}";
+        cd "${BASE_DIR}"
         git checkout ${GIT_HASH}
         echo "using hash ${GIT_HASH}"
       fi
       ;;
     private-svn)
-      cd "${DEV_BASE_DIR}";
+      cd "${DEV_BASE_DIR}"
       SVN_CO="svn co"
       if [ -n "${SOURCE_REVISION:+x}" ]; then
-        SVN_CO="${SVN_CO} -r ${SOURCE_REVISION}";
+        SVN_CO="${SVN_CO} -r ${SOURCE_REVISION}"
       fi
-      ${SVN_CO} ${SOURCE_URL} "${BASE_DIR}" --username="${SVN_USERNAME}";
+      ${SVN_CO} ${SOURCE_URL} "${BASE_DIR}" --username="${SVN_USERNAME}"
       ;;
     wget)
       [ -z "${SOURCE_FORMAT}" ] && ( echo "SOURCE_FORMAT undefined in package $package"; return; )
-      cd "${DEV_BASE_DIR}";
+      cd "${DEV_BASE_DIR}"
       if [ -d "${BASE_DIR}" ]; then
-        echo "We have already downloaded $package for ${BASE_DIR}";
-        return;
+        echo "We have already downloaded $package for ${BASE_DIR}"
+        return
       fi
       # Settings (proxy etc.) for wget can be edited using /etc/wgetrc
       echo "${WGET_METHOD}"
-      eval "${WGET_METHOD}" "${SOURCE_URL}"
+      eval "${WGET_METHOD}" "${SOURCE_URL}" || exit
       case ${SOURCE_FORMAT} in
         zip)
           if [ -n "${EXDIR:+x}" ]; then
-            unzip `basename ${SOURCE_URL}` -d "${BASE_DIR}";
+            unzip `basename ${SOURCE_URL}` -d "${BASE_DIR}"
           else
-            unzip `basename ${SOURCE_URL}`;
+            unzip `basename ${SOURCE_URL}`
           fi
-          rm -f `basename ${SOURCE_URL}`;
+          rm -f `basename ${SOURCE_URL}`
           #if [ -d "${BASE_DIR}" ]; then
-          #  echo "The BASE_DIR for $package already exists.";
+          #  echo "The BASE_DIR for $package already exists."
           #else
-          #  mkdir -p "${BASE_DIR}";
+          #  mkdir -p "${BASE_DIR}"
           #fi
           ;;
         tgz)
           TEMPBASENAME=`basename ${SOURCE_URL}`
           PACKAGE_BASE_DIR_NAME=$( tar tf "${TEMPBASENAME}" | grep -o '^[^/]\+' | sort -u )
-          tar xvf "${TEMPBASENAME}";
-          rm -f `basename ${SOURCE_URL}`;
+          tar xvf "${TEMPBASENAME}"
+          rm -f `basename ${SOURCE_URL}`
           if [ -d "${BASE_DIR}" ]; then
-            echo "The BASE_DIR for $package already exists.";
+            echo "The BASE_DIR for $package already exists."
           else
-            mv "${PACKAGE_BASE_DIR_NAME}" "${BASE_DIR}";
+            mv "${PACKAGE_BASE_DIR_NAME}" "${BASE_DIR}"
           fi
           ;;
         bz2)
           TEMPBASENAME=`basename ${SOURCE_URL}`
           PACKAGE_BASE_DIR_NAME=$( tar tf "${TEMPBASENAME}" | grep -o '^[^/]\+' | sort -u )
-          tar xvfjk "${TEMPBASENAME}";
-          rm -f "${TEMPBASENAME}";
+          tar xvfjk "${TEMPBASENAME}"
+          rm -f "${TEMPBASENAME}"
           if [ -d "${BASE_DIR}" ]; then
-            echo "The BASE_DIR for $package already exists.";
+            echo "The BASE_DIR for $package already exists."
           else
-            mv "${PACKAGE_BASE_DIR_NAME}" "${BASE_DIR}";
+            mv "${PACKAGE_BASE_DIR_NAME}" "${BASE_DIR}"
           fi
           ;;
         7z)
           SZIP_CMD="7z x $( basename ${SOURCE_URL} )"
           if [ -n "${SZIP_OUTPUT_DIR:+x}" ]; then
-            SZIP_CMD="${SZIP_CMD} -o${SZIP_OUTPUT_DIR}";
+            SZIP_CMD="${SZIP_CMD} -o${SZIP_OUTPUT_DIR}"
           fi
           ${SZIP_CMD}
-          rm -f $( basename ${SOURCE_URL} );
+          rm -f $( basename ${SOURCE_URL} )
           ;;
         xz)
-          xz -cd `basename ${SOURCE_URL}` | tar -xvf -;
-          rm -f `basename ${SOURCE_URL}`;
+          xz -cd `basename ${SOURCE_URL}` | tar -xvf -
+          rm -f `basename ${SOURCE_URL}`
           ;;
         bin)
           TEMPBASENAME=`basename ${SOURCE_URL}`
-          sh "${TEMPBASENAME}";
-          rm -f "${TEMPBASENAME}";
+          sh "${TEMPBASENAME}"
+          rm -f "${TEMPBASENAME}"
           #if [ -d "${BASE_DIR}" ]; then
-          #  echo "The BASE_DIR for $package already exists.";
+          #  echo "The BASE_DIR for $package already exists."
           #else
-          #  mv "${PACKAGE_BASE_DIR_NAME}" "${BASE_DIR}";
+          #  mv "${PACKAGE_BASE_DIR_NAME}" "${BASE_DIR}"
           #fi
           ;;
         *)
-          echo "Source format ${SOURCE_FORMAT} not supported";
+          echo "Source format ${SOURCE_FORMAT} not supported"
           ;;
       esac
       ;;
     *)
-      echo "Source retrieval method ${SOURCE_RETRIEVAL_METHOD} not supported";
+      echo "Source retrieval method ${SOURCE_RETRIEVAL_METHOD} not supported"
       ;;
   esac
 }
@@ -613,14 +614,14 @@ function e()
 
   #is this option really a package
   if [ ! -e "$script" ]; then
-    echo "$package is not a package.";
-    return;
+    echo "$package is not a package."
+    return
   fi
 
   #
   #reset the vars for the builds
   #
-  unsetvars;
+  unsetvars
 
   #
   # setup the build types unless other wise specified in a build file
@@ -650,10 +651,10 @@ function e()
   if [ "${check_out_source}" = "yes" ]; then
     if [ -z "${SOURCE_URL}" ]; then echo "SOURCE_URL undefined in package $package"; return; fi
     if [ -z "${SOURCE_RETRIEVAL_METHOD}" ]; then echo "SOURCE_RETRIEVAL_METHOD undefined in package $package"; return; fi
-    source_retrieval;
+    source_retrieval
     if [ ! -z "${POST_RETRIEVAL_METHOD}" ]; then
         echo "Running the POST_RETRIEVAL_METHOD for $package."
-        cd "${SOURCE_DIR}";
+        cd "${SOURCE_DIR}"
         for cmd in "${POST_RETRIEVAL_METHOD[@]}"; do eval "${cmd}"; done
     fi
   fi
@@ -669,8 +670,8 @@ function e()
         if [ -d "${BASE_DIR}" ]; then
             # If we have defined svn version there is no need to update the code
             if [ ! -n "${SOURCE_REVISION:+x}" ]; then
-                cd "${BASE_DIR}";
-                svn up;
+                cd "${BASE_DIR}"
+                svn up
             fi
 
         # Assume that if the base directory does not exist, it has not been checked out
@@ -680,36 +681,36 @@ function e()
           [ -z "${SOURCE_URL}" ] && ( echo "SOURCE_URL undefined in package $package"; return; )
           [ -z "${SOURCE_RETRIEVAL_METHOD}" ] && ( echo "SOURCE_RETRIEVAL_METHOD undefined in package $package"; return; )
 
-          source_retrieval;
+          source_retrieval
         fi
         ;;
       hg)
         if [ -d "${BASE_DIR}" ]; then
-          cd "${BASE_DIR}";
-          hg pull;
-          hg update;
+          cd "${BASE_DIR}"
+          hg pull
+          hg update
         else
           echo "${BASE_DIR} non-existent, checking out ...."
           [ -z "${SOURCE_URL}" ] && ( echo "SOURCE_URL undefined in package $package"; return; )
           [ -z "${SOURCE_RETRIEVAL_METHOD}" ] && ( echo "SOURCE_RETRIEVAL_METHOD undefined in package $package"; return; )
 
-          source_retrieval;
+          source_retrieval
         fi
         ;;
       git)
         if [ -d "${BASE_DIR}" ]; then
-          cd "${BASE_DIR}";
-          git pull;
+          cd "${BASE_DIR}"
+          git pull
         else
           echo "${BASE_DIR} non-existent, checking out ...."
           [ -z "${SOURCE_URL}" ] && ( echo "SOURCE_URL undefined in package $package"; return; )
           [ -z "${SOURCE_RETRIEVAL_METHOD}" ] && ( echo "SOURCE_RETRIEVAL_METHOD undefined in package $package"; return; )
 
-          source_retrieval;
+          source_retrieval
         fi
         ;;
       *)
-        echo "Source update method ${SOURCE_RETRIEVAL_METHOD} not supported";
+        echo "Source update method ${SOURCE_RETRIEVAL_METHOD} not supported"
         ;;
     esac
   fi
@@ -726,35 +727,35 @@ function e()
 
     for method in "${PREBUILD_METHOD[@]}"; do case ${method} in
       bjam)
-        cd "${SOURCE_DIR}";
-        "${BJAM_PREBUILD}";
+        cd "${SOURCE_DIR}"
+        "${BJAM_PREBUILD}"
         ;;
       cmake)
-        cd "${BUILD_DIR}";
+        cd "${BUILD_DIR}"
         echo $BUILD_DIR
         which cmake
-        ${CMAKE} "${SOURCE_DIR}" "${CMAKE_PARAMS[@]}";
+        ${CMAKE} "${SOURCE_DIR}" "${CMAKE_PARAMS[@]}"
         echo ${CMAKE_PARAMS[@]}
         echo "done prebuild"
         ;;
       configure)
-        cd "${BUILD_DIR}";
-        ${CONFIGURE} "${CONFIGURE_PARAMS[@]}";
+        cd "${BUILD_DIR}"
+        ${CONFIGURE} "${CONFIGURE_PARAMS[@]}"
         ;;
       custom)
-        cd "${SOURCE_DIR}";
+        cd "${SOURCE_DIR}"
         for cmd in "${CUSTOM_PREBUILD[@]}"; do eval "${cmd}"; done
-        echo "Ran custom prebuild step.";
+        echo "Ran custom prebuild step."
         ;;
       devenv)
-        cd "${SOURCE_DIR}";
+        cd "${SOURCE_DIR}"
         for SolutionName in "${MSVC_SOLUTION[@]}"; do
           DEVENV_SWITCHES=( "/upgrade" )
           devenv_cmd
         done
         ;;
       *)
-        echo "Pre-Build method ${PREBUILD_METHOD} unsupported";
+        echo "Pre-Build method ${PREBUILD_METHOD} unsupported"
         ;;
     esac done
   fi
@@ -784,14 +785,14 @@ function e()
         done
         ;;
       msbuild)
-        cd "${BUILD_DIR}";
+        cd "${BUILD_DIR}"
 
         if [ -d "${BUILD_TARGET}" ]; then
           MSVC_PROJECT+=( "${BUILD_TARGET}" )
         fi
 
         for name in "${MSVC_PROJECT[@]}"; do
-          PROJ_STR="$PROJ_STR$name$( [ "$name" != "${MSVC_PROJECT[@]: -1}" ] && echo ';' )";
+          PROJ_STR="$PROJ_STR$name$( [ "$name" != "${MSVC_PROJECT[@]: -1}" ] && echo ';' )"
         done
 
         if [ -z "${PROJ_STR}" ]; then
@@ -807,7 +808,7 @@ function e()
         fi
         ;;
       cmake)
-        cd "${BUILD_DIR}";
+        cd "${BUILD_DIR}"
         echo $BUILD_DIR
         case $PLATFORM in
           Windows)
@@ -817,7 +818,7 @@ function e()
 
             unset PROJ_STR
             for name in "${MSVC_PROJECT[@]}"; do
-              PROJ_STR="$PROJ_STR$name$( [ "$name" != "${MSVC_PROJECT[@]: -1}" ] && echo ';' )";
+              PROJ_STR="$PROJ_STR$name$( [ "$name" != "${MSVC_PROJECT[@]: -1}" ] && echo ';' )"
             done
             #http://www.cmake.org/cmake/help/cmake-2-8-docs.html#opt:--builddir
             echo "Build Command: --build ${BUILD_DIR} -- $MSVC_SOLUTION /build $MSVC_CONFIG|$MSVC_PLATFORM /project $PROJ_STR"
@@ -840,7 +841,7 @@ function e()
             fi
             ;;
           Darwin | Linux )
-            eval "${MAKE} ${JCMD} ${BUILD_TARGET}";
+            eval "${MAKE} ${JCMD} ${BUILD_TARGET}"
             ;;
         esac
         ;;
@@ -853,18 +854,18 @@ function e()
         fi
         ;;
       scons)
-        cd "${BUILD_DIR}";
-        ${SCONS} "${SCONS_PARAMS[@]}" ${BUILD_TARGET} ${JCMD};
+        cd "${BUILD_DIR}"
+        ${SCONS} "${SCONS_PARAMS[@]}" ${BUILD_TARGET} ${JCMD}
         ;;
       bjam)
-        cd "${SOURCE_DIR}";
+        cd "${SOURCE_DIR}"
         echo "Build Comand: ${BJAM_PARAMS[@]} ${BUILD_TARGET} ${JCMD}"
-        ${BJAM} "${BJAM_PARAMS[@]}" ${BUILD_TARGET} ${JCMD};
+        ${BJAM} "${BJAM_PARAMS[@]}" ${BUILD_TARGET} ${JCMD}
         ;;
       custom)
-        cd "${SOURCE_DIR}";
+        cd "${SOURCE_DIR}"
         for cmd in "${CUSTOM_BUILD[@]}"; do eval "${cmd}"; done
-        echo "Ran custom build step.";
+        echo "Ran custom build step."
         ;;
       *)
         echo "Build method ${BUILD_METHOD} unsupported"
@@ -874,11 +875,11 @@ function e()
       if [ ! -d "${INSTALL_DIR}/lib/flagpoll" ]; then mkdir -p "${INSTALL_DIR}/lib/flagpoll"; fi
       case $PLATFORM in
         Windows)
-          cp "${VES_SRC_DIR}/dist/win/fpc_deps_files/release/${FPC_FILE}.in" "${INSTALL_DIR}/lib/flagpoll/${FPC_FILE}";
+          cp "${VES_SRC_DIR}/dist/win/fpc_deps_files/release/${FPC_FILE}.in" "${INSTALL_DIR}/lib/flagpoll/${FPC_FILE}"
           echo "Installing ${VES_SRC_DIR}/dist/win/fpc_deps_files/release/${FPC_FILE}.in to ${INSTALL_DIR}/lib/flagpoll/${FPC_FILE}"
           ;;
         Darwin | Linux)
-          cp "${VES_SRC_DIR}/dist/linux/fpc_deps_files/${FPC_FILE}.in" "${INSTALL_DIR}/lib/flagpoll/${FPC_FILE}";
+          cp "${VES_SRC_DIR}/dist/linux/fpc_deps_files/${FPC_FILE}.in" "${INSTALL_DIR}/lib/flagpoll/${FPC_FILE}"
           echo "Installing ${VES_SRC_DIR}/dist/linux/fpc_deps_files/${FPC_FILE}.in to ${INSTALL_DIR}/lib/flagpoll/${FPC_FILE}"
           ;;
       esac
@@ -886,7 +887,7 @@ function e()
     fi
     if [ ! -z "${POST_BUILD_METHOD}" ]; then
       echo "Running the POST_BUILD_METHOD for $package."
-      cd "${BUILD_DIR}";
+      cd "${BUILD_DIR}"
       for cmd in "${POST_BUILD_METHOD[@]}"; do eval "${cmd}"; done
     fi
   fi
@@ -900,19 +901,19 @@ function e()
 
     case ${BUILD_METHOD} in
       bjam)
-        cd "${SOURCE_DIR}";
-        ${BJAM} "${BJAM_PARAMS[@]}" --reconfigure --clean-all;
+        cd "${SOURCE_DIR}"
+        ${BJAM} "${BJAM_PARAMS[@]}" --reconfigure --clean-all
         ;;
       msbuild)
-        cd "${BUILD_DIR}";
+        cd "${BUILD_DIR}"
 
         for name in "${MSVC_PROJECT[@]}"; do
-          PROJ_STR="$PROJ_STR${name}:Clean$( [ "$name" != "${MSVC_PROJECT[@]: -1}" ] && echo ';' )";
+          PROJ_STR="$PROJ_STR${name}:Clean$( [ "$name" != "${MSVC_PROJECT[@]: -1}" ] && echo ';' )"
         done
 
         "${MSBUILD}" "$MSVC_SOLUTION" /t:"$PROJ_STR" "${MCMD}" \
          /p:Configuration="$MSVC_CONFIG" /p:Platform="$MSVC_PLATFORM" \
-         /verbosity:Normal /p:WarningLevel=0;
+         /verbosity:Normal /p:WarningLevel=0
         ;;
       make)
         cd "${BUILD_DIR}"
@@ -922,7 +923,7 @@ function e()
             make_cmd
             ;;
           Darwin | Linux )
-            eval "${MAKE} clean";
+            eval "${MAKE} clean"
             ;;
         esac
         ;;
@@ -945,15 +946,15 @@ function e()
         nmake_cmd
         ;;
       *)
-        echo "Clean method ${BUILD_METHOD} unsupported";
+        echo "Clean method ${BUILD_METHOD} unsupported"
         ;;
     esac
   fi
 
   #Build the ctag files
   if [ "${build_ctag_files}" = "yes" ]; then
-    cd ${INSTALL_DIR}/include;
-    ctags $package;
+    cd ${INSTALL_DIR}/include
+    ctags $package
   fi
 
   #
@@ -973,7 +974,7 @@ function e()
     case $PLATFORM in
       Windows )
         #if [ -z "${ISS_FILENAME}" ]; then echo "ISS_FILENAME undefined in package $package"; return; fi
-        #innosetup;
+        #innosetup
         zip -r "${REL_BASE_DIR}".zip "${REL_INSTALL_DIR}"
         ;;
       Darwin | Linux )
@@ -999,13 +1000,13 @@ function e()
     case $PLATFORM in
       Windows )
         if [ -z "${ISS_FILENAME}" ]; then echo "ISS_FILENAME undefined in package $package"; return; fi
-        innosetup;
+        innosetup
         ;;
       Darwin | Linux )
           for p in "${VES_PACKAGES[@]}"; do
               unsetvars
               cd "${PRESENT_DIR}"
-              . "${p}".build;
+              . "${p}".build
               if [ ! -z "${VES_INSTALL_PARAMS}" ]; then
                   echo "Installing ${INSTALL_DIR}/. to ${DEPS_INSTALL_DIR}"
                   cd "${INSTALL_DIR}"
@@ -1035,9 +1036,9 @@ case $opts in
   b) export build="yes";;
   j)
     if [[ $OPTARG =~ [^1-8] ]] ; then
-      echo "Error: '$OPTARG' not a valid number." >&2;
-      usage;
-      kill -SIGINT $$;
+      echo "Error: '$OPTARG' not a valid number." >&2
+      usage
+      kill -SIGINT $$
     fi
     export multithreading_jobs=$OPTARG
     #export build="yes"  # implied
@@ -1115,7 +1116,7 @@ export_config_vars()
     rm -f "${EXPORT_FILE}"
     for f in $*; do
       #eval $( sed -n '/^\s*PACKAGE_NAME\s*=/p;/^\s*BASE_DIR\s*=/p;/^\s*INSTALL_DIR\s*=/p;' $f )
-      unsetvars;
+      unsetvars
       . "${f}"
       echo "export ${PACKAGE_NAME}_INSTALL_DIR=\"${INSTALL_DIR}\"" >> "${EXPORT_FILE}"
     done
@@ -1129,10 +1130,10 @@ if [ "${build_auto_installer}" = "yes" ] ; then
 else
   export_config_vars "${BUILD_FILES[@]}"
 
-  test "${PLATFORM}" == "Linux" && PATH=${java_INSTALL_DIR}/bin:${swig_INSTALL_DIR}/bin:${PATH};
+  test "${PLATFORM}" == "Linux" && PATH=${java_INSTALL_DIR}/bin:${swig_INSTALL_DIR}/bin:${PATH}
   for p in $@; do
     cd "${PRESENT_DIR}"
-    e "${p}";
+    e "${p}"
     cd "${PRESENT_DIR}"
   done
 fi
