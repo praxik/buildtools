@@ -371,7 +371,8 @@ function unsetvars()
   unset POST_RETRIEVAL_METHOD
   unset POST_BUILD_METHOD
   unset SOURCE_REVISION
-  unset GIT_BRANCH_VERSION
+  unset GIT_BRANCH
+  unset GIT_CLONE_ARGS
   unset GIT_HASH
   unset SZIP_OUTPUT_DIR
   unset PREBUILD_METHOD
@@ -504,17 +505,15 @@ function source_retrieval()
       ;;
     git)
       cd "${DEV_BASE_DIR}"
+      if [ -n "${GIT_BRANCH:+x}" ]; then
+        GIT_CLONE_ARGS+=( "--branch=${GIT_BRANCH}" )
+        GIT_CLONE_ARGS+=( "--single-branch" )
+      fi
       if [ $PLATFORM = "Windows" ]; then
         #Replace "/" with "\" on Windows; this prevents the "C" directory from being created
-        git clone ${SOURCE_URL} "${BASE_DIR//\//\\}"
+        git clone ${SOURCE_URL} "${BASE_DIR//\//\\}" "${GIT_CLONE_ARGS[@]}"
       else
-        git clone ${SOURCE_URL} "${BASE_DIR}"
-      fi
-      if [ -n "${GIT_BRANCH_VERSION:+x}" ]; then
-        cd "${BASE_DIR}"
-        git checkout -t origin/${GIT_BRANCH_VERSION}
-        git pull
-        echo "using custom command ${GIT_BRANCH_VERSION}"
+        git clone ${SOURCE_URL} "${BASE_DIR}" "${GIT_CLONE_ARGS[@]}"
       fi
       if [ -n "${GIT_HASH:+x}" ]; then
         cd "${BASE_DIR}"

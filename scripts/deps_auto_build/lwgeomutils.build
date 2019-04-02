@@ -3,7 +3,7 @@ BASE_DIR="${DEV_BASE_DIR}/lwgeom-utils"
 
 SOURCE_RETRIEVAL_METHOD=git
 SOURCE_URL=https://github.com/jbkoch7/lwgeom-utils.git
-GIT_BRANCH_VERSION=master
+GIT_BRANCH=master
 
 SOURCE_DIR="${BASE_DIR}"
 BUILD_DIR="${SOURCE_DIR}/build-${ARCH}"
