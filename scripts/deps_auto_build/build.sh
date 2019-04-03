@@ -390,6 +390,7 @@ function unsetvars()
   unset CL
   unset LINK
   unset EXDIR
+  unset SOURCE_URL
 }
 
 #
@@ -537,8 +538,10 @@ function source_retrieval()
         return
       fi
       # Settings (proxy etc.) for wget can be edited using /etc/wgetrc
-      echo "${WGET_METHOD}"
-      eval "${WGET_METHOD}" "${SOURCE_URL}"
+      for url in "${SOURCE_URL[@]}"; do
+        echo "${WGET_METHOD}" "${url}"
+        if eval "${WGET_METHOD}" "${url}"; then break; fi
+      done
       case ${SOURCE_FORMAT} in
         zip)
           if [ -n "${EXDIR:+x}" ]; then
