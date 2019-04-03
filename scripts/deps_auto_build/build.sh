@@ -538,9 +538,11 @@ function source_retrieval()
         return
       fi
       # Settings (proxy etc.) for wget can be edited using /etc/wgetrc
-      for url in "${SOURCE_URL[@]}"; do
-        echo "${WGET_METHOD}" "${url}"
-        if eval "${WGET_METHOD}" "${url}"; then break; fi
+      declare -i N="${#SOURCE_URL[*]}"-1
+      for i in $(seq 0 $N); do
+        echo "${WGET_METHOD}" "${SOURCE_URL[$i]}"
+        if eval "${WGET_METHOD}" "${SOURCE_URL[$i]}"; then break; fi
+        if [ "${i}" -eq "${N}" ]; then exit 1; fi
       done
       case ${SOURCE_FORMAT} in
         zip)
