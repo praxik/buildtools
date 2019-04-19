@@ -1,9 +1,13 @@
 PACKAGE_NAME=saga
-BASE_DIR="${DEV_BASE_DIR}/saga-6.2.0"
+BASE_DIR="${DEV_BASE_DIR}/saga-7.2.0_src"
 
 SOURCE_RETRIEVAL_METHOD=git
 SOURCE_URL=https://git.code.sf.net/p/saga-gis/code
-GIT_BRANCH=release-6.2.0
+GIT_HASH=b271cbf5b2c968d9d6e262564c1eb063b5efac13
+
+#SOURCE_RETRIEVAL_METHOD=wget
+#SOURCE_URL=https://sourceforge.net/projects/saga-gis/files/SAGA%20-%207/SAGA%20-%207.2.0/saga-7.2.0_src.zip
+#SOURCE_FORMAT=zip
 
 SOURCE_DIR="${BASE_DIR}/saga-gis"
 BUILD_DIR="${SOURCE_DIR}/build-${ARCH}"

@@ -11,7 +11,7 @@ case $PLATFORM in
   Windows)
     SOURCE_FORMAT=zip
     EXDIR=true
-    SOURCE_URL=https://github.com/Esri/file-geodatabase-api/raw/master/FileGDB_API_1.5.1/FileGDB_API_1_5_1-VS2013.zip
+    SOURCE_URL=https://github.com/Esri/file-geodatabase-api/raw/master/FileGDB_API_1.5.1/FileGDB_API_1_5_1-VS2017.zip
     ;;
   Darwin )
     SOURCE_FORMAT=zip
@@ -19,6 +19,6 @@ case $PLATFORM in
     ;;
   Linux )
     SOURCE_FORMAT=tgz
-    SOURCE_URL=https://github.com/Esri/file-geodatabase-api/raw/master/FileGDB_API_1.5.1/FileGDB_API_1_5_1-64.tar.gz
+    SOURCE_URL=https://github.com/Esri/file-geodatabase-api/raw/master/FileGDB_API_1.5.1/FileGDB_API_1_5_1-64gcc51.tar.gz
     ;;
 esac

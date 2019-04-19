@@ -1,5 +1,5 @@
 PACKAGE_NAME=mapnik
-BASE_DIR="${DEV_BASE_DIR}/mapnik-3.0.18"
+BASE_DIR="${DEV_BASE_DIR}/mapnik-3.0.22"
 
 SOURCE_RETRIEVAL_METHOD=wget
 
@@ -18,7 +18,7 @@ case $PLATFORM in
     #https://github.com/mapbox/windows-builds
     #https://github.com/mapnik/mapnik-gyp
     SOURCE_FORMAT=bz2
-    SOURCE_URL=https://github.com/mapnik/mapnik/releases/download/v3.0.18/mapnik-v3.0.18.tar.bz2
+    SOURCE_URL=https://github.com/mapnik/mapnik/releases/download/v3.0.22/mapnik-v3.0.22.tar.bz2
 
     MAPNIK_GYP="${SOURCE_DIR}/mapnik-gyp-${ARCH}"
     BUILD="${MAPNIK_GYP}/build"
@@ -30,6 +30,8 @@ case $PLATFORM in
     # gyp
     CUSTOM_PREBUILD+=( "if [ ! -d ${MAPNIK_GYP} ]; then git clone https://github.com/mapnik/mapnik-gyp.git ${MAPNIK_GYP} && cd ${MAPNIK_GYP}; else cd ${MAPNIK_GYP} && git checkout -- . && git pull; fi" )
     CUSTOM_PREBUILD+=( "if [ ! -d ${GYP} ]; then git clone https://chromium.googlesource.com/external/gyp.git ${GYP}; else cd ${GYP} && git checkout -- . && git pull && cd ${MAPNIK_GYP}; fi" )
+    # fix
+    CUSTOM_PREBUILD+=( "find ${SOURCE_DIR}/include/mapnik -type f -name \"*.hpp\" -exec sed -i 's/__cpp_inheriting_constructors/__junk_inheriting_constructors/g' {} \;" )
     # copy
     CUSTOM_PREBUILD+=( "mkdir -p ${MAPNIK_SDK}/include/mapnik" )
     CUSTOM_PREBUILD+=( "cp -R ${SOURCE_DIR}/include/mapnik/version.hpp ${MAPNIK_SDK}/include/mapnik" )
@@ -55,6 +57,8 @@ case $PLATFORM in
     CUSTOM_PREBUILD+=( "cp -R ${webp_INSTALL_DIR}/lib/. ${MAPNIK_SDK}/lib" )
     CUSTOM_PREBUILD+=( "cp -R ${proj_INSTALL_DIR}/include/. ${MAPNIK_SDK}/include" )
     CUSTOM_PREBUILD+=( "cp -R ${proj_INSTALL_DIR}/lib/. ${MAPNIK_SDK}/lib" )
+    CUSTOM_PREBUILD+=( "cp -R ${sqlite_INSTALL_DIR}/include/. ${MAPNIK_SDK}/include" )
+    CUSTOM_PREBUILD+=( "cp -R ${sqlite_INSTALL_DIR}/lib/. ${MAPNIK_SDK}/lib" )
     CUSTOM_PREBUILD+=( "cp -R ${tiff_INSTALL_DIR}/include/. ${MAPNIK_SDK}/include" )
     CUSTOM_PREBUILD+=( "cp -R ${tiff_INSTALL_DIR}/lib/. ${MAPNIK_SDK}/lib" )
     CUSTOM_PREBUILD+=( "cp -R ${cairo_INSTALL_DIR}/include/. ${MAPNIK_SDK}/include" )
@@ -65,6 +69,9 @@ case $PLATFORM in
     CUSTOM_PREBUILD+=( "sed -i 's/lib\(boost_.*-mt-\)</\1<(boost_arch)-</g' ${MAPNIK_GYP}/mapnik.gyp" ) # dynamic linking and arch fix
     CUSTOM_PREBUILD+=( "sed -i 's/\(\"webp_lib\":\"\)libwebp_dll\.lib/\1webp\.lib/g' ${MAPNIK_GYP}/mapnik.gyp" ) # static linking
     CUSTOM_PREBUILD+=( "sed -i 's/\(libpng16\)\(\.lib\)/\1_static\2/g' ${MAPNIK_GYP}/mapnik.gyp" ) # static linking
+    CUSTOM_PREBUILD+=( "sed -i 's/\(proj\)\(\.lib\)/\1_6_1\2/g' ${MAPNIK_GYP}/mapnik.gyp" ) # support proj6
+    CUSTOM_PREBUILD+=( "sed -i 's/^\(\(\s\+\).*MAPNIK_USE_PROJ4.*\)$/\1\n\2\"ACCEPT_USE_OF_DEPRECATED_PROJ_API_H\",/' ${MAPNIK_GYP}/mapnik.gyp" )
+    CUSTOM_PREBUILD+=( "sed -i 's/^\(\(\s\+\).*proj.*\.lib.*\)$/\1\n\2\"sqlite3.lib\",/' ${MAPNIK_GYP}/mapnik.gyp" )
     CUSTOM_PREBUILD+=( "sed -i 's/\(libtiff\)_i\(\.lib\)/\1\2/g' ${MAPNIK_GYP}/mapnik.gyp" ) # static linking
     CUSTOM_PREBUILD+=( "sed -i 's/\(zlib\)\(\.lib\)/\1static\2/g' ${MAPNIK_GYP}/mapnik.gyp" ) # static linking
     #CUSTOM_PREBUILD+=( "sed -i 's/\(cairo\)\(\.lib\)/\1-static\2/g' ${MAPNIK_GYP}/mapnik.gyp" ) # static linking

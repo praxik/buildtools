@@ -1,8 +1,8 @@
 PACKAGE_NAME=gdal
-BASE_DIR="${DEV_BASE_DIR}/gdal-2.2.3"
+BASE_DIR="${DEV_BASE_DIR}/gdal-3.0.0"
 
 SOURCE_RETRIEVAL_METHOD=wget
-SOURCE_URL=http://download.osgeo.org/gdal/2.2.3/gdal-2.2.3.tar.gz
+SOURCE_URL=http://download.osgeo.org/gdal/3.0.0/gdal-3.0.0.tar.gz
 SOURCE_FORMAT=tgz
 
 SOURCE_DIR="${BASE_DIR}"
@@ -19,19 +19,21 @@ case $PLATFORM in
     NMAKE_ARGS+=( "MSVC_VER=${MSVC_VER}" )
     NMAKE_ARGS+=( "VERSION=${VS_VERSION//./}" )
     NMAKE_ARGS+=( "GDAL_HOME=\"${INSTALL_DIR//\//\\}\"" )
-    export XERCES_DIR="${XERCES_INSTALL_DIR}"
-    export XERCES_INCLUDE="-I${XERCES_INSTALL_DIR}/include -I${XERCES_INSTALL_DIR}/include/xercesc"
-    export XERCES_LIB="${XERCES_INSTALL_DIR}/lib/xerces-c_3.lib"
+    NMAKE_ARGS+=( "XERCES_DIR=\"${XERCES_INSTALL_DIR}\"" )
+    NMAKE_ARGS+=( "XERCES_INCLUDE=\"-I${XERCES_INSTALL_DIR}/include -I${XERCES_INSTALL_DIR}/include/xercesc\"" )
+    NMAKE_ARGS+=( "XERCES_LIB=\"${XERCES_INSTALL_DIR}/lib/xerces-c_3.lib\"" )
+    NMAKE_ARGS+=( "SQLITE_INC=\"-I${sqlite_INSTALL_DIR}/include\"" )
+    NMAKE_ARGS+=( "SQLITE_LIB=\"${sqlite_INSTALL_DIR}/lib/sqlite3.lib\"" )
     NMAKE_ARGS+=( "PROJ_FLAGS=\"-DPROJ_STATIC\"" )
     NMAKE_ARGS+=( "PROJ_INCLUDE=\"-I${proj_INSTALL_DIR}/include\"" )
-    NMAKE_ARGS+=( "PROJ_LIBRARY=\"${proj_INSTALL_DIR}/lib/proj.lib\"" )
-    export CURL_DIR="${curl_INSTALL_DIR}"
-    export CURL_INC="-I${curl_INSTALL_DIR}/include"
-    export CURL_LIB="${curl_INSTALL_DIR}/lib/libcurl_imp.lib wsock32.lib wldap32.lib winmm.lib"
+    NMAKE_ARGS+=( "PROJ_LIBRARY=\"${proj_INSTALL_DIR}/lib/proj_6_1.lib\"" )
+    NMAKE_ARGS+=( "CURL_DIR=\"${curl_INSTALL_DIR}\"" )
+    NMAKE_ARGS+=( "CURL_INC=\"-I${curl_INSTALL_DIR}/include\"" )
+    NMAKE_ARGS+=( "CURL_LIB=\"${curl_INSTALL_DIR}/lib/libcurl_imp.lib wsock32.lib wldap32.lib winmm.lib\"" )
     NMAKE_ARGS+=( "CURL_CFLAGS=\"-DCURL_STATICLIB\"" )
-    export GEOS_DIR="${geos_INSTALL_DIR}"
-    export GEOS_CFLAGS="-I${geos_INSTALL_DIR}/include -DHAVE_GEOS"
-    export GEOS_LIB="${geos_INSTALL_DIR}/lib/geos_c.lib"
+    NMAKE_ARGS+=( "GEOS_DIR=\"${geos_INSTALL_DIR}\"" )
+    NMAKE_ARGS+=( "GEOS_CFLAGS=\"-I${geos_INSTALL_DIR}/include -DHAVE_GEOS\"" )
+    NMAKE_ARGS+=( "GEOS_LIB=\"${geos_INSTALL_DIR}/lib/geos_c.lib\"" )
     NMAKE_ARGS+=( "FGDB_ENABLED=\"YES\"" )
     NMAKE_ARGS+=( "FGDB_SDK=\"${filegdbsdk_INSTALL_DIR}\"" )
     NMAKE_ARGS+=( "FGDB_INC=\"${filegdbsdk_INSTALL_DIR}/include\"" )
@@ -43,21 +45,8 @@ case $PLATFORM in
     fi
     NMAKE_INST_ARG=devinstall
 
-    #Cleanup environment
-    POST_BUILD_METHOD+=( "cd ${SOURCE_DIR}/data" )
-    POST_BUILD_METHOD+=( "find ./ -type f -name 'esri_extra.wkt' | cpio -pdmu ${INSTALL_DIR}/data" )
-    POST_BUILD_METHOD+=( "echo '102039,PROJCS[\"USA_Contiguous_Albers_Equal_Area_Conic_USGS_version\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Albers_Conic_Equal_Area\"],PARAMETER[\"False_Easting\",0.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",-96.0],PARAMETER[\"Standard_Parallel_1\",29.5],PARAMETER[\"Standard_Parallel_2\",45.5],PARAMETER[\"Latitude_Of_Origin\",23.0],UNIT[\"Meter\",1.0],AUTHORITY[\"EPSG\",\"102039\"]]' >> ${INSTALL_DIR}/data/esri_extra.wkt" )
     POST_BUILD_METHOD+=( "cd ${SOURCE_DIR}" )
     POST_BUILD_METHOD+=( "cp --parents -r swig/include ${INSTALL_DIR}" )
-    POST_BUILD_METHOD+=( "unset XERCES_DIR" )
-    POST_BUILD_METHOD+=( "unset XERCES_INCLUDE" )
-    POST_BUILD_METHOD+=( "unset XERCES_LIB" )
-    POST_BUILD_METHOD+=( "unset CURL_DIR" )
-    POST_BUILD_METHOD+=( "unset CURL_INC" )
-    POST_BUILD_METHOD+=( "unset CURL_LIB" )
-    POST_BUILD_METHOD+=( "unset GEOS_DIR" )
-    POST_BUILD_METHOD+=( "unset GEOS_CFLAGS" )
-    POST_BUILD_METHOD+=( "unset GEOS_LIB" )
     ;;
   Darwin)
     PREBUILD_METHOD=configure
@@ -65,7 +54,7 @@ case $PLATFORM in
     CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
     CONFIGURE_PARAMS+=( --with-threads=-lpthread )
     CONFIGURE_PARAMS+=( --with-geotiff=internal )
-    CONFIGURE_PARAMS+=( --with-static-proj4="${proj_INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --with-proj="${proj_INSTALL_DIR}" )
     CONFIGURE_PARAMS+=( --with-geos="${geos_INSTALL_DIR}/bin/geos-config" )
     CONFIGURE_PARAMS+=( LDFLAGS="-L/usr/lib -liconv -stdlib=libc++" )
     CONFIGURE_PARAMS+=( CXXFLAGS="-I${ICU_INSTALL_DIR}/include -std=c++11 -stdlib=libc++" )
@@ -77,9 +66,6 @@ case $PLATFORM in
     #CONFIGURE_PARAMS+=( --with-jasper="${jasper_INSTALL_DIR}" )
     CONFIGURE_PARAMS+=( --with-openjpeg="${openjpeg_INSTALL_DIR}" )
 
-    POST_BUILD_METHOD=( "cd ${SOURCE_DIR}/data" )
-    POST_BUILD_METHOD+=( "find ./ -type f -name 'esri_extra.wkt' | cpio -pdmu ${INSTALL_DIR}/share/gdal" )
-    POST_BUILD_METHOD+=( "echo '102039,PROJCS[\"USA_Contiguous_Albers_Equal_Area_Conic_USGS_version\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Albers_Conic_Equal_Area\"],PARAMETER[\"False_Easting\",0.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",-96.0],PARAMETER[\"Standard_Parallel_1\",29.5],PARAMETER[\"Standard_Parallel_2\",45.5],PARAMETER[\"Latitude_Of_Origin\",23.0],UNIT[\"Meter\",1.0],AUTHORITY[\"EPSG\",\"102039\"]]' >> ${INSTALL_DIR}/share/gdal/esri_extra.wkt" )
     POST_BUILD_METHOD+=( "cd ${SOURCE_DIR}" )
     POST_BUILD_METHOD+=( "ditto swig/include ${INSTALL_DIR}/swig/include" )
     ;;
@@ -89,7 +75,7 @@ case $PLATFORM in
     CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
     CONFIGURE_PARAMS+=( --with-threads=-lpthread )
     CONFIGURE_PARAMS+=( --with-geotiff=internal )
-    CONFIGURE_PARAMS+=( --with-static-proj4="${proj_INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --with-proj="${proj_INSTALL_DIR}" )
     CONFIGURE_PARAMS+=( --with-geos="${geos_INSTALL_DIR}/bin/geos-config" )
     CONFIGURE_PARAMS+=( --without-libtool )
     CONFIGURE_PARAMS+=( --without-pg )
@@ -104,9 +90,6 @@ case $PLATFORM in
       CONFIGURE_PARAMS+=( --with-xerces="${XERCES_INSTALL_DIR}" )
     fi
 
-    POST_BUILD_METHOD=( "cd ${SOURCE_DIR}/data" )
-    POST_BUILD_METHOD+=( "find ./ -type f -name 'esri_extra.wkt' | cpio -pdmu ${INSTALL_DIR}/share/gdal" )
-    POST_BUILD_METHOD+=( "echo '102039,PROJCS[\"USA_Contiguous_Albers_Equal_Area_Conic_USGS_version\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Albers_Conic_Equal_Area\"],PARAMETER[\"False_Easting\",0.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",-96.0],PARAMETER[\"Standard_Parallel_1\",29.5],PARAMETER[\"Standard_Parallel_2\",45.5],PARAMETER[\"Latitude_Of_Origin\",23.0],UNIT[\"Meter\",1.0],AUTHORITY[\"EPSG\",\"102039\"]]' >> ${INSTALL_DIR}/share/gdal/esri_extra.wkt" )
     POST_BUILD_METHOD+=( "cd ${SOURCE_DIR}" )
     POST_BUILD_METHOD+=( "cp --parents -r swig/include ${INSTALL_DIR}" )
     POST_BUILD_METHOD+=( "cp swig/python/scripts/*.py ${INSTALL_DIR}/bin" )

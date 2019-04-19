@@ -1,9 +1,15 @@
 PACKAGE_NAME=sqlite
-BASE_DIR="${DEV_BASE_DIR}/sqlite-autoconf-3070701"
 
 SOURCE_RETRIEVAL_METHOD=wget
-SOURCE_URL=http://www.sqlite.org/sqlite-autoconf-3070701.tar.gz
+if [ ${PLATFORM} = "Windows" ]; then
+BASE_DIR="${DEV_BASE_DIR}/sqlite-amalgamation-3280000"
+SOURCE_URL=https://sqlite.org/2019/sqlite-amalgamation-3280000.zip
+SOURCE_FORMAT=zip
+else
+BASE_DIR="${DEV_BASE_DIR}/sqlite-autoconf-3280000"
+SOURCE_URL=https://sqlite.org/2019/sqlite-autoconf-3280000.tar.gz
 SOURCE_FORMAT=tgz
+fi
 
 SOURCE_DIR="${BASE_DIR}"
 BUILD_DIR="${BASE_DIR}/build-${ARCH}"
@@ -11,10 +17,18 @@ INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
 
 case $PLATFORM in
   Windows)
-    unset PROJ_STR
-    unset BUILD_TARGET
-    SOURCE_URL=http://sqlite.org/2013/sqlite-dll-win32-x86-3080100.zip
-    SOURCE_FORMAT=zip
+    BUILD_METHOD=custom
+    CUSTOM_BUILD+=( "cd ${BUILD_DIR}" )
+    CUSTOM_BUILD+=( "CL_ARGS=( ../shell.c ../sqlite3.c -Fesqlite3.exe ) ; cl_cmd" )
+    CUSTOM_BUILD+=( "CL_ARGS=( /c /EHsc ../sqlite3.c ) ; cl_cmd" )
+    CUSTOM_BUILD+=( "LIB_ARGS=( sqlite3.obj ) ; lib_cmd" )
+
+    POST_BUILD_METHOD+=( "mkdir -p ${INSTALL_DIR}/bin" )
+    POST_BUILD_METHOD+=( "mkdir -p ${INSTALL_DIR}/include" )
+    POST_BUILD_METHOD+=( "mkdir -p ${INSTALL_DIR}/lib" )
+    POST_BUILD_METHOD+=( "cp ${BUILD_DIR}/*.exe ${INSTALL_DIR}/bin" )
+    POST_BUILD_METHOD+=( "cp ${SOURCE_DIR}/*.h ${INSTALL_DIR}/include" )
+    POST_BUILD_METHOD+=( "cp ${BUILD_DIR}/*.lib ${INSTALL_DIR}/lib" )
     ;;
   Darwin)
     PREBUILD_METHOD=configure

@@ -1,8 +1,8 @@
 PACKAGE_NAME=OPENSSL
-BASE_DIR="${DEV_BASE_DIR}/openssl-1.0.2n"
+BASE_DIR="${DEV_BASE_DIR}/openssl-1.0.2r"
 
 SOURCE_RETRIEVAL_METHOD=wget
-SOURCE_URL=https://www.openssl.org/source/openssl-1.0.2n.tar.gz
+SOURCE_URL=https://www.openssl.org/source/openssl-1.0.2r.tar.gz
 SOURCE_FORMAT=tgz
 
 case $PLATFORM in

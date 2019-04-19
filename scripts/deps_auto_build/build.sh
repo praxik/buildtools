@@ -218,15 +218,37 @@ function windows()
   if [ ! -e "${TMPFILE}.exe" ]; then
     find . -type f -name "${TMPFILE}.*" -delete
     echo "void main(){ printf( \"%d\", _MSC_VER ); }" >> "${TMPFILE}.c"
-    CL=( "${CMD}" )
-    CL+=( "vcvarsall.bat "${VCVARSALL_ARG}"" )
-    CL+=( "\&\&" )
-    CL+=( "cl.exe ${TMPFILE}.c" )
-    eval "${CL[@]}" >/dev/null 2>&1
+    CL_ARGS="${TMPFILE}.c"
+    cl_cmd
+    unset CL_ARGS
     find . -type f -name "${TMPFILE}.*" -and -not -name "${TMPFILE}.exe" -delete
   fi
   MSVC_VER="$( ./${TMPFILE}.exe )"
   echo "Using Visual C++ compiler version: ${MSVC_VER}"
+}
+#
+# Windows cl cmd
+#
+function cl_cmd()
+{
+  CL=( "${CMD}" )
+  CL+=( "vcvarsall.bat "${VCVARSALL_ARG}"" )
+  CL+=( "\&\&" )
+  CL+=( "cl.exe "${CL_ARGS[@]}"" )
+  printf '%s ' "${CL[@]//\\&/&}"; printf '\n\n'
+  eval "${CL[@]}" >/dev/null 2>&1
+}
+#
+# Windows lib cmd
+#
+function lib_cmd()
+{
+  LIB=( "${CMD}" )
+  LIB+=( "vcvarsall.bat "${VCVARSALL_ARG}"" )
+  LIB+=( "\&\&" )
+  LIB+=( "lib.exe "${LIB_ARGS[@]}"" )
+  printf '%s ' "${LIB[@]//\\&/&}"; printf '\n\n'
+  eval "${LIB[@]}" >/dev/null 2>&1
 }
 #
 # Windows devenv cmd
@@ -360,6 +382,8 @@ function unsetvars()
   unset CONFIGURE_PARAMS
   unset MSVC_PROJECT
   unset MSVC_SOLUTION
+  unset CL_ARGS
+  unset LIB_ARGS
   unset DEVENV_SWITCHES
   unset MAKE_ARGS
   unset MAKE_INST_ARG
@@ -547,6 +571,7 @@ function source_retrieval()
       case ${SOURCE_FORMAT} in
         zip)
           if [ -n "${EXDIR:+x}" ]; then
+            mkdir -p "${BASE_DIR}" && \
             unzip `basename ${SOURCE_URL}` -d "${BASE_DIR}"
           else
             unzip `basename ${SOURCE_URL}`

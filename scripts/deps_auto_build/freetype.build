@@ -1,9 +1,9 @@
 PACKAGE_NAME=freetype
-BASE_DIR="${DEV_BASE_DIR}/freetype-2.9"
+BASE_DIR="${DEV_BASE_DIR}/freetype-2.10.0"
 
 SOURCE_RETRIEVAL_METHOD=wget
-SOURCE_URL+=( https://download.savannah.gnu.org/releases/freetype/freetype-2.9.tar.gz )
-SOURCE_URL+=( https://sourceforge.net/projects/freetype/files/freetype2/2.9/freetype-2.9.tar.gz )
+SOURCE_URL+=( https://download.savannah.gnu.org/releases/freetype/freetype-2.10.0.tar.gz )
+SOURCE_URL+=( https://sourceforge.net/projects/freetype/files/freetype2/2.10.0/freetype-2.10.0.tar.gz )
 SOURCE_FORMAT=tgz
 
 SOURCE_DIR="${BASE_DIR}"
@@ -12,8 +12,6 @@ INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
 
 case $PLATFORM in
   Windows)
-    POST_RETRIEVAL_METHOD=( "cp -R ${VES_SRC_DIR}/patches/freetype/* ${SOURCE_DIR}" )
-
     PREBUILD_METHOD=cmake
     BUILD_METHOD=cmake
 
@@ -38,6 +36,7 @@ case $PLATFORM in
     PREBUILD_METHOD=configure
     CONFIGURE=../configure
     CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --enable-freetype-config )
     POST_BUILD_METHOD="make install"
     ;;
   Linux)
@@ -46,6 +45,7 @@ case $PLATFORM in
     PREBUILD_METHOD=configure
     CONFIGURE=../configure
     CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --enable-freetype-config )
     CONFIGURE_PARAMS+=( --with-harfbuzz=no )
     ;;
 esac

@@ -1,9 +1,9 @@
 PACKAGE_NAME=PNG
-BASE_DIR="${DEV_BASE_DIR}/libpng-1.6.34"
+BASE_DIR="${DEV_BASE_DIR}/libpng-1.6.37"
 
 SOURCE_RETRIEVAL_METHOD=wget
 SOURCE_FORMAT=tgz
-SOURCE_URL=http://prdownloads.sourceforge.net/libpng/libpng-1.6.34.tar.gz
+SOURCE_URL=http://prdownloads.sourceforge.net/libpng/libpng-1.6.37.tar.gz
 
 SOURCE_DIR="${BASE_DIR}"
 BUILD_DIR="${BASE_DIR}/build-${ARCH}"
@@ -16,8 +16,6 @@ CMAKE_PARAMS+=( -DBUILD_STATIC_LIBS=ON )
 
 case $PLATFORM in
   Windows)
-    POST_RETRIEVAL_METHOD+=( "sed -i 's/libpng ASM C/libpng C/g' CMakeLists.txt" )
-
     MSVC_CONFIG="${BUILD_TYPE}"
     if [ ${ARCH} = "32-bit" ]; then
       MSVC_PLATFORM=Win32

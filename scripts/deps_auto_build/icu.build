@@ -3,7 +3,7 @@ BASE_DIR="${DEV_BASE_DIR}/icu"
 
 SOURCE_RETRIEVAL_METHOD=wget
 SOURCE_FORMAT=tgz
-SOURCE_URL=http://download.icu-project.org/files/icu4c/62.1/icu4c-62_1-src.tgz
+SOURCE_URL=http://download.icu-project.org/files/icu4c/64.1/icu4c-64_1-src.tgz
 
 SOURCE_DIR="${BASE_DIR}"
 BUILD_DIR="${BASE_DIR}/build-${ARCH}"
@@ -25,9 +25,16 @@ case $PLATFORM in
       INSTALL_DIR_LIB=lib64
     fi
     MSVC_SOLUTION=( "${SOURCE_DIR}/source/allinone/allinone.sln" )
+    MSVC_PROJECT+=( "common" )
+    MSVC_PROJECT+=( "i18n" )
+    MSVC_PROJECT+=( "io" )
+    MSVC_PROJECT+=( "stubdata" )
+    MSVC_PROJECT+=( "toolutil" )
 
-    if (( "${VS_VERSION/.*}" > 14 )); then
+    if (( "${VS_VERSION/.*}" > 15 )); then
       PREBUILD_METHOD=devenv
+    else
+      SKIP_PREBUILD=yes
     fi
 
     POST_BUILD_METHOD=( "mkdir -p ${INSTALL_DIR}" )

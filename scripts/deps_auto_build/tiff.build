@@ -1,8 +1,8 @@
 PACKAGE_NAME=tiff
-BASE_DIR="${DEV_BASE_DIR}/tiff-4.0.9"
+BASE_DIR="${DEV_BASE_DIR}/tiff-4.0.10"
 
 SOURCE_RETRIEVAL_METHOD=wget
-SOURCE_URL=http://download.osgeo.org/libtiff/tiff-4.0.9.tar.gz
+SOURCE_URL=http://download.osgeo.org/libtiff/tiff-4.0.10.tar.gz
 SOURCE_FORMAT=tgz
 
 SOURCE_DIR="${BASE_DIR}"

@@ -22,8 +22,8 @@ case $PLATFORM in
   Linux)
     PREBUILD_METHOD=configure
     CONFIGURE=../configure
-    CONFIGURE_PARAMS+=( CFLAGS="$(pkg-config --cflags libpng12)" ) || :
-    CONFIGURE_PARAMS+=( LDFLAGS="$(pkg-config --libs libpng12)" ) || :
+    CONFIGURE_PARAMS+=( CFLAGS="$(pkg-config --cflags libpng16)" ) || :
+    CONFIGURE_PARAMS+=( LDFLAGS="$(pkg-config --libs libpng16)" ) || :
     CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
     ;;
 esac
