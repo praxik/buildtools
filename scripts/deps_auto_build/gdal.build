@@ -1,8 +1,8 @@
 PACKAGE_NAME=gdal
-BASE_DIR="${DEV_BASE_DIR}/gdal-2.2.3"
+BASE_DIR="${DEV_BASE_DIR}/gdal-2.3.0"
 
 SOURCE_RETRIEVAL_METHOD=wget
-SOURCE_URL=http://download.osgeo.org/gdal/2.2.3/gdal-2.2.3.tar.gz
+SOURCE_URL=http://download.osgeo.org/gdal/2.3.0/gdal-2.3.0.tar.gz
 SOURCE_FORMAT=tgz
 
 SOURCE_DIR="${BASE_DIR}"
