@@ -2,8 +2,8 @@ PACKAGE_NAME=lwgeom
 BASE_DIR="${DEV_BASE_DIR}/lwgeom"
 
 SOURCE_RETRIEVAL_METHOD=git
-SOURCE_URL=https://github.com/jbkoch7/lwgeom.git
-GIT_BRANCH=master
+SOURCE_URL=git@github.com:praxik/lwgeom.git
+GIT_BRANCH=release-2.5
 
 SOURCE_DIR="${BASE_DIR}"
 BUILD_DIR="${SOURCE_DIR}/build-${ARCH}"
@@ -18,8 +18,7 @@ CMAKE_PARAMS+=( -DGEOS_DIR="${geos_INSTALL_DIR}" )
 CMAKE_PARAMS+=( -DGEOS_USE_STATIC_LIBS=OFF )
 CMAKE_PARAMS+=( -DPROJ_DIR="${proj_INSTALL_DIR}" )
 CMAKE_PARAMS+=( -DPROJ_USE_STATIC_LIBS=OFF )
-CMAKE_PARAMS+=( -DJSON_C_DIR="${jsonc_INSTALL_DIR}" )
-CMAKE_PARAMS+=( -DJSON_C_USE_STATIC_LIBS=ON )
+CMAKE_PARAMS+=( -DJSON_C_USE_STATIC_LIBS=OFF )
 
 case $PLATFORM in
   Windows)
@@ -30,6 +29,9 @@ case $PLATFORM in
       MSVC_PLATFORM=x64
     fi
     MSVC_SOLUTION=( "lwgeom.sln" )
+
+    CMAKE_PARAMS+=( -DJSON_C_DIR="${jsonc_INSTALL_DIR}" )
+    CMAKE_PARAMS+=( -DJSON_C_USE_STATIC_LIBS=ON )
     ;;
   Darwin)
     ;;
