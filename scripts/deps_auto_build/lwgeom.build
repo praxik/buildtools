@@ -28,7 +28,7 @@ case $PLATFORM in
     else
       MSVC_PLATFORM=x64
     fi
-    MSVC_SOLUTION=( "lwgeom.sln" )
+    MSVC_SOLUTION=( "LWGEOM.sln" )
 
     CMAKE_PARAMS+=( -DJSON_C_DIR="${jsonc_INSTALL_DIR}" )
     CMAKE_PARAMS+=( -DJSON_C_USE_STATIC_LIBS=ON )
