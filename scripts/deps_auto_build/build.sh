@@ -570,24 +570,22 @@ function source_retrieval()
       done
       case ${SOURCE_FORMAT} in
         zip)
+          TEMPBASENAME=`basename ${SOURCE_URL}`
           if [ -n "${EXDIR:+x}" ]; then
-            mkdir -p "${BASE_DIR}" && \
-            unzip `basename ${SOURCE_URL}` -d "${BASE_DIR}"
+            mkdir -p "${BASE_DIR}"
+            unzip "${TEMPBASENAME}" -d "${BASE_DIR}"
           else
-            unzip `basename ${SOURCE_URL}`
+            PACKAGE_BASE_DIR_NAME=$( unzip -Z -1 "${TEMPBASENAME}" | head -1 )
+            unzip "${TEMPBASENAME}"
+            mv "${PACKAGE_BASE_DIR_NAME}" "${BASE_DIR}"
           fi
-          rm -f `basename ${SOURCE_URL}`
-          #if [ -d "${BASE_DIR}" ]; then
-          #  echo "The BASE_DIR for $package already exists."
-          #else
-          #  mkdir -p "${BASE_DIR}"
-          #fi
+          rm -f "${TEMPBASENAME}"
           ;;
         tgz)
           TEMPBASENAME=`basename ${SOURCE_URL}`
           PACKAGE_BASE_DIR_NAME=$( tar tf "${TEMPBASENAME}" | grep -o '^[^/]\+' | sort -u )
           tar xvf "${TEMPBASENAME}"
-          rm -f `basename ${SOURCE_URL}`
+          rm -f "${TEMPBASENAME}"
           if [ -d "${BASE_DIR}" ]; then
             echo "The BASE_DIR for $package already exists."
           else
