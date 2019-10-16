@@ -1,0 +1,35 @@
+PACKAGE_NAME=openblas
+BASE_DIR="${DEV_BASE_DIR}/openblas-0.3.7"
+
+SOURCE_RETRIEVAL_METHOD=wget
+SOURCE_FORMAT=zip
+SOURCE_URL=https://github.com/xianyi/OpenBLAS/archive/v0.3.7.zip
+
+SOURCE_DIR="${BASE_DIR}"
+BUILD_DIR="${BASE_DIR}/build-${ARCH}"
+INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+PREBUILD_METHOD=cmake
+
+CMAKE_PARAMS+=( -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" )
+
+case $PLATFORM in
+  Windows)
+    MSVC_CONFIG="${BUILD_TYPE}"
+    if [ ${ARCH} = "32-bit" ]; then
+      MSVC_PLATFORM=Win32
+    else
+      MSVC_PLATFORM=x64
+    fi
+    MSVC_SOLUTION=( "openblas.sln" )
+
+    CMAKE_PARAMS+=( -DCMAKE_CONFIGURATION_TYPES="${BUILD_TYPE}" )
+    CMAKE_PARAMS+=( -DBUILD_WITHOUT_LAPACK=OFF )
+    CMAKE_PARAMS+=( -DNOFORTRAN=ON )
+    ;;
+  Darwin)
+    CMAKE_PARAMS+=( -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" )
+    ;;
+  Linux)
+    CMAKE_PARAMS+=( -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" )
+    ;;
+esac
