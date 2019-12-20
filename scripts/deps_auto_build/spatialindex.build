@@ -1,0 +1,34 @@
+PACKAGE_NAME=spatialindex
+BASE_DIR="${DEV_BASE_DIR}/spatialindex-1.9.0"
+
+SOURCE_RETRIEVAL_METHOD=wget
+SOURCE_FORMAT=zip
+SOURCE_URL=https://github.com/libspatialindex/libspatialindex/archive/1.9.0.zip
+
+SOURCE_DIR="${BASE_DIR}"
+BUILD_DIR="${BASE_DIR}/build-${ARCH}"
+INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
+PREBUILD_METHOD=cmake
+
+CMAKE_PARAMS+=( -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" )
+CMAKE_PARAMS+=( -DSIDX_BUILD_TESTS=OFF )
+
+case $PLATFORM in
+  Windows)
+    MSVC_CONFIG="${BUILD_TYPE}"
+    if [ ${ARCH} = "32-bit" ]; then
+      MSVC_PLATFORM=Win32
+    else
+      MSVC_PLATFORM=x64
+    fi
+    MSVC_SOLUTION=( "libspatialindex.sln" )
+
+    CMAKE_PARAMS+=( -DCMAKE_CONFIGURATION_TYPES="${BUILD_TYPE}" )
+    ;;
+  Darwin)
+    CMAKE_PARAMS+=( -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" )
+    ;;
+  Linux)
+    CMAKE_PARAMS+=( -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" )
+    ;;
+esac
