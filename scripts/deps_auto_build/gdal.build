@@ -1,8 +1,8 @@
 PACKAGE_NAME=gdal
-BASE_DIR="${DEV_BASE_DIR}/gdal-3.0.2"
+BASE_DIR="${DEV_BASE_DIR}/gdal-3.0.4"
 
 SOURCE_RETRIEVAL_METHOD=wget
-SOURCE_URL=http://download.osgeo.org/gdal/3.0.2/gdal-3.0.2.tar.gz
+SOURCE_URL=http://download.osgeo.org/gdal/3.0.4/gdal-3.0.4.tar.gz
 SOURCE_FORMAT=tgz
 
 SOURCE_DIR="${BASE_DIR}"
@@ -25,7 +25,7 @@ case $PLATFORM in
     NMAKE_ARGS+=( "SQLITE_INC=\"-I${sqlite_INSTALL_DIR}/include\"" )
     NMAKE_ARGS+=( "SQLITE_LIB=\"${sqlite_INSTALL_DIR}/lib/sqlite3.lib\"" )
     NMAKE_ARGS+=( "PROJ_INCLUDE=\"-I${proj_INSTALL_DIR}/include\"" )
-    NMAKE_ARGS+=( "PROJ_LIBRARY=\"${proj_INSTALL_DIR}/lib/proj_6_2.lib\"" )
+    NMAKE_ARGS+=( "PROJ_LIBRARY=\"${proj_INSTALL_DIR}/lib/proj.lib\"" )
     NMAKE_ARGS+=( "CURL_DIR=\"${curl_INSTALL_DIR}\"" )
     NMAKE_ARGS+=( "CURL_INC=\"-I${curl_INSTALL_DIR}/include\"" )
     NMAKE_ARGS+=( "CURL_LIB=\"${curl_INSTALL_DIR}/lib/libcurl_imp.lib wsock32.lib wldap32.lib winmm.lib\"" )

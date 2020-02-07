@@ -69,7 +69,6 @@ case $PLATFORM in
     CUSTOM_PREBUILD+=( "sed -i 's/lib\(boost_.*-mt-\)</\1<(boost_arch)-</g' ${MAPNIK_GYP}/mapnik.gyp" ) # dynamic linking and arch fix
     CUSTOM_PREBUILD+=( "sed -i 's/\(\"webp_lib\":\"\)libwebp_dll\.lib/\1webp\.lib/g' ${MAPNIK_GYP}/mapnik.gyp" ) # static linking
     CUSTOM_PREBUILD+=( "sed -i 's/\(libpng16\)\(\.lib\)/\1_static\2/g' ${MAPNIK_GYP}/mapnik.gyp" ) # static linking
-    CUSTOM_PREBUILD+=( "sed -i 's/\(proj\)\(\.lib\)/\1_6_2\2/g' ${MAPNIK_GYP}/mapnik.gyp" ) # support proj6
     CUSTOM_PREBUILD+=( "sed -i 's/^\(\(\s\+\).*MAPNIK_USE_PROJ4.*\)$/\1\n\2\"ACCEPT_USE_OF_DEPRECATED_PROJ_API_H\",/' ${MAPNIK_GYP}/mapnik.gyp" )
     CUSTOM_PREBUILD+=( "sed -i 's/^\(\(\s\+\).*proj.*\.lib.*\)$/\1\n\2\"sqlite3.lib\",/' ${MAPNIK_GYP}/mapnik.gyp" )
     CUSTOM_PREBUILD+=( "sed -i 's/\(libtiff\)_i\(\.lib\)/\1\2/g' ${MAPNIK_GYP}/mapnik.gyp" ) # static linking
