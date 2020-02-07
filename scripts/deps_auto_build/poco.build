@@ -11,6 +11,9 @@ INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
 
 POST_RETRIEVAL_METHOD=( "cp -R ${VES_SRC_DIR}/patches/poco/* ${SOURCE_DIR}" )
 
+PREBUILD_METHOD=cmake
+BUILD_METHOD=cmake
+
 CMAKE_PARAMS+=( -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" )
 CMAKE_PARAMS+=( -DENABLE_XML=ON )
 CMAKE_PARAMS+=( -DENABLE_JSON=ON )
@@ -20,6 +23,7 @@ CMAKE_PARAMS+=( -DENABLE_DATA=ON )
 CMAKE_PARAMS+=( -DENABLE_DATA_SQLITE=ON )
 CMAKE_PARAMS+=( -DENABLE_ZIP=ON )
 
+CMAKE_PARAMS+=( -DENABLE_TESTS=OFF )
 CMAKE_PARAMS+=( -DENABLE_MONGODB=OFF )
 CMAKE_PARAMS+=( -DENABLE_REDIS=OFF )
 CMAKE_PARAMS+=( -DENABLE_PDF=OFF )
@@ -36,9 +40,6 @@ CMAKE_PARAMS+=( -DENABLE_PAGECOMPILER_FILE2PAGE=OFF )
 
 case $PLATFORM in
   Windows)
-    PREBUILD_METHOD=cmake
-    BUILD_METHOD=cmake
-
     MSVC_CONFIG="${BUILD_TYPE}"
     if [ ${ARCH} = "32-bit" ]; then
       MSVC_PLATFORM=Win32
@@ -51,27 +52,11 @@ case $PLATFORM in
     CMAKE_PARAMS+=( -DENABLE_DATA_ODBC=ON )
     ;;
   Darwin)
-    PREBUILD_METHOD=configure
-    CONFIGURE=../configure
-    CONFIGURE_PARAMS+=( --no-tests )
-    CONFIGURE_PARAMS+=( --no-samples )
-    #For ODBC support install iODBC
-    CONFIGURE_PARAMS+=( --omit=Data/MySQL )
-    #CONFIGURE_PARAMS+=( --config=Darwin64 )
-    CONFIGURE_PARAMS+=( --config=Darwin64-clang-libc++ )
-    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
     ;;
   Linux)
-    PREBUILD_METHOD=configure
-    CONFIGURE=../configure
-    CONFIGURE_PARAMS+=( --no-tests )
-    CONFIGURE_PARAMS+=( --no-samples )
-    OMIT="Data/MySQL"
     BUILD_ODBC=$( ldconfig -p | grep libodbc.so ) || :
-    if [[ -z "$BUILD_ODBC" ]]; then
-      OMIT+=",Data/ODBC"
+    if [[ -n "$BUILD_ODBC" ]]; then
+      CMAKE_PARAMS+=( -DENABLE_DATA_ODBC=ON )
     fi
-    CONFIGURE_PARAMS+=( --omit=$OMIT )
-    CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
     ;;
 esac
