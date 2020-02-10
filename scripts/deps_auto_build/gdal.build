@@ -79,11 +79,11 @@ case $PLATFORM in
     CONFIGURE_PARAMS+=( --without-libtool )
     CONFIGURE_PARAMS+=( --without-pg )
     CONFIGURE_PARAMS+=( CXXFLAGS="-std=c++11 -Dlinux" )
-    #EXPAT=$( ldconfig -p | grep libexpat ) || :
-    #CONFIGURE_PARAMS+=( --with-expat-lib=/usr/lib/x86_64-linux-gnu/libexpat.so )
-    #CONFIGURE_PARAMS+=( LDFLAGS="-L/usr/lib/x86_64-linux-gnu -lexpat" )
     if [[ -d "${filegdbsdk_INSTALL_DIR}" ]]; then
       CONFIGURE_PARAMS+=( --with-fgdb="${filegdbsdk_INSTALL_DIR}" )
+    fi
+    if [[ -d "${sqlite_INSTALL_DIR}" ]]; then
+      CONFIGURE_PARAMS+=( --with-sqlite3="${sqlite_INSTALL_DIR}" )
     fi
     if [[ -d "${XERCES_INSTALL_DIR}" ]]; then
       CONFIGURE_PARAMS+=( --with-xerces="${XERCES_INSTALL_DIR}" )
