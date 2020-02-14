@@ -21,6 +21,9 @@ CMAKE_PARAMS+=( -DGEOS_USE_STATIC_LIBS=OFF )
 CMAKE_PARAMS+=( -DPROJ_DIR="${proj_INSTALL_DIR}" )
 CMAKE_PARAMS+=( -DPROJ_USE_STATIC_LIBS=OFF )
 CMAKE_PARAMS+=( -DJSON_C_USE_STATIC_LIBS=OFF )
+if [[ -d "${sqlite_INSTALL_DIR}" ]]; then
+  CMAKE_PARAMS+=( -DCMAKE_PREFIX_PATH="${sqlite_INSTALL_DIR}" )
+fi
 
 case $PLATFORM in
   Windows)
@@ -34,8 +37,6 @@ case $PLATFORM in
 
     CMAKE_PARAMS+=( -DJSON_C_DIR="${jsonc_INSTALL_DIR}" )
     CMAKE_PARAMS+=( -DJSON_C_USE_STATIC_LIBS=ON )
-    CMAKE_PARAMS+=( -DSQLite3_INCLUDE_DIR="${sqlite_INSTALL_DIR}/include" )
-    CMAKE_PARAMS+=( -DSQLite3_LIBRARY="${sqlite_INSTALL_DIR}/lib/sqlite3.lib" )
     ;;
   Darwin)
     ;;
