@@ -3,9 +3,9 @@ PACKAGE_NAME=swig
 case $PLATFORM in
   Windows)
     SOURCE_RETRIEVAL_METHOD=wget
-    SOURCE_URL=http://prdownloads.sourceforge.net/swig/swigwin-3.0.12.zip
+    SOURCE_URL=http://prdownloads.sourceforge.net/swig/swigwin-4.0.2.zip
     SOURCE_FORMAT=zip
-    BASE_DIR="${DEV_BASE_DIR}/swigwin-3.0.12"
+    BASE_DIR="${DEV_BASE_DIR}/swigwin-4.0.2"
     BUILD_DIR="${BASE_DIR}"
     INSTALL_DIR="${BASE_DIR}"
     unset BUILD_METHOD

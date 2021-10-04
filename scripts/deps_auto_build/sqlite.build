@@ -2,12 +2,12 @@ PACKAGE_NAME=sqlite
 
 SOURCE_RETRIEVAL_METHOD=wget
 if [ ${PLATFORM} = "Windows" ]; then
-BASE_DIR="${DEV_BASE_DIR}/sqlite-amalgamation-3280000"
-SOURCE_URL=https://sqlite.org/2019/sqlite-amalgamation-3280000.zip
+BASE_DIR="${DEV_BASE_DIR}/sqlite-amalgamation-3360000"
+SOURCE_URL=https://sqlite.org/2019/sqlite-amalgamation-3360000.zip
 SOURCE_FORMAT=zip
 else
-BASE_DIR="${DEV_BASE_DIR}/sqlite-autoconf-3280000"
-SOURCE_URL=https://sqlite.org/2019/sqlite-autoconf-3280000.tar.gz
+BASE_DIR="${DEV_BASE_DIR}/sqlite-autoconf-3360000"
+SOURCE_URL=https://sqlite.org/2019/sqlite-autoconf-3360000.tar.gz
 SOURCE_FORMAT=tgz
 fi
 
