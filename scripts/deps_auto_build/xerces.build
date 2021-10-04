@@ -1,8 +1,8 @@
 PACKAGE_NAME=XERCES
-BASE_DIR="${DEV_BASE_DIR}/xerces-c-3.2.2"
+BASE_DIR="${DEV_BASE_DIR}/xerces-c-3.2.3"
 
 SOURCE_RETRIEVAL_METHOD=wget
-SOURCE_URL=https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.2.tar.gz
+SOURCE_URL=https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.3.tar.gz
 SOURCE_FORMAT=tgz
 
 SOURCE_DIR="${BASE_DIR}"
