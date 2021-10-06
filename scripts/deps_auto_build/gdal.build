@@ -90,7 +90,7 @@ case $PLATFORM in
     fi
 
     POST_BUILD_METHOD+=( "cd ${SOURCE_DIR}" )
-    POST_BUILD_METHOD+=( "cp --parents -r swig/include ${INSTALL_DIR}" )
-    POST_BUILD_METHOD+=( "cp swig/python/scripts/*.py ${INSTALL_DIR}/bin" )
+    #POST_BUILD_METHOD+=( "cp --parents -r swig/include ${INSTALL_DIR}" )
+    #POST_BUILD_METHOD+=( "cp swig/python/scripts/*.py ${INSTALL_DIR}/bin" )
     ;;
 esac
