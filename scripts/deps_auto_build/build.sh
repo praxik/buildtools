@@ -577,7 +577,11 @@ function source_retrieval()
           else
             PACKAGE_BASE_DIR_NAME=$( unzip -Z -1 "${TEMPBASENAME}" | head -1 )
             unzip "${TEMPBASENAME}"
-            mv "${PACKAGE_BASE_DIR_NAME}" "${BASE_DIR}"
+            if [ -d "${BASE_DIR}" ]; then
+              echo "The BASE_DIR for $package already exists."
+            else
+              mv "${PACKAGE_BASE_DIR_NAME}" "${BASE_DIR}"
+            fi
           fi
           rm -f "${TEMPBASENAME}"
           ;;

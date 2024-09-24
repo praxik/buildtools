@@ -1,11 +1,12 @@
 PACKAGE_NAME=swig
 
+SOURCE_RETRIEVAL_METHOD=wget
+
 case $PLATFORM in
   Windows)
-    SOURCE_RETRIEVAL_METHOD=wget
-    SOURCE_URL=http://prdownloads.sourceforge.net/swig/swigwin-4.0.2.zip
+    SOURCE_URL=http://prdownloads.sourceforge.net/swig/swigwin-4.2.1.zip
     SOURCE_FORMAT=zip
-    BASE_DIR="${DEV_BASE_DIR}/swigwin-4.0.2"
+    BASE_DIR="${DEV_BASE_DIR}/swigwin-4.2.1"
     BUILD_DIR="${BASE_DIR}"
     INSTALL_DIR="${BASE_DIR}"
     unset BUILD_METHOD
@@ -18,12 +19,10 @@ case $PLATFORM in
     CONFIGURE_PARAMS+=( LDFLAGS="-L${PCRE_INSTALL_DIR}/lib -lpcre" )
     ;&
   Linux)
-    SOURCE_RETRIEVAL_METHOD=git
-    SOURCE_URL=https://github.com/swig/swig.git
-    GIT_BRANCH=master
-    GIT_HASH=ae0efd3d742ad083312fadbc652d4d66fdad6f4d
+    SOURCE_FORMAT=tgz
+    SOURCE_URL=http://prdownloads.sourceforge.net/swig/swig-4.2.1.tar.gz
 
-    BASE_DIR="${DEV_BASE_DIR}/swig-4.0.2"
+    BASE_DIR="${DEV_BASE_DIR}/swig-4.2.1"
     BUILD_DIR="${BASE_DIR}/build-${ARCH}"
     INSTALL_DIR="${BASE_DIR}/install-${ARCH}"
 
@@ -31,7 +30,7 @@ case $PLATFORM in
     CUSTOM_PREBUILD+=( ./autogen.sh )
     CONFIGURE=../configure
     CONFIGURE_PARAMS+=( --prefix="${INSTALL_DIR}" )
-    CONFIGURE_PARAMS+=( --with-pcre-prefix="${PCRE_INSTALL_DIR}" )
+    CONFIGURE_PARAMS+=( --with-pcre2-prefix="${PCRE2_INSTALL_DIR}" )
 
     BUILD_METHOD=make
     BUILD_TARGET=" && make install"

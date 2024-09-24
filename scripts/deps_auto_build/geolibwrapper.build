@@ -30,12 +30,12 @@ case $PLATFORM in
     ;;
   Darwin )
     CMAKE_PARAMS+=( -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" )
-    CMAKE_PARAMS+=( -DCMAKE_CXX_FLAGS="-Wall -std=c++11 -stdlib=libc++" )
+    CMAKE_PARAMS+=( -DCMAKE_CXX_FLAGS="-Wall -std=c++14 -stdlib=libc++" )
     CMAKE_PARAMS+=( -DGeographicLib_DIR="${geographiclib_INSTALL_DIR}/lib/cmake/GeographicLib" )
     ;;
   Linux )
     CMAKE_PARAMS+=( -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" )
-    CMAKE_PARAMS+=( -DCMAKE_CXX_FLAGS="-Wall -Wno-return-type -Wno-unused-local-typedefs -std=c++11" )
+    CMAKE_PARAMS+=( -DCMAKE_CXX_FLAGS="-Wall -Wno-return-type -Wno-unused-local-typedefs -std=c++14" )
     CMAKE_PARAMS+=( -DGeographicLib_DIR="${geographiclib_INSTALL_DIR}/lib/cmake/GeographicLib" )
     ;;
 esac
