@@ -1,5 +1,5 @@
 PACKAGE_NAME=filegdbsdk
-BASE_DIR="${DEV_BASE_DIR}/FileGDB_API_1.5.1"
+BASE_DIR="${DEV_BASE_DIR}/FileGDB_API_1.5.3"
 
 SOURCE_RETRIEVAL_METHOD=wget
 
@@ -11,14 +11,14 @@ case $PLATFORM in
   Windows)
     SOURCE_FORMAT=zip
     EXDIR=true
-    SOURCE_URL=https://github.com/Esri/file-geodatabase-api/raw/master/FileGDB_API_1.5.1/FileGDB_API_1_5_1-VS2017.zip
+    SOURCE_URL=https://github.com/Esri/file-geodatabase-api/raw/master/FileGDB_API_1.5.3/FileGDB_API_VS2022.zip
     ;;
   Darwin )
     SOURCE_FORMAT=zip
-    SOUCE_URL=https://github.com/Esri/file-geodatabase-api/raw/master/FileGDB_API_1.5.1/FileGDB_API_1_5_1-64clang.zip
+    SOURCE_URL=https://github.com/Esri/file-geodatabase-api/raw/master/FileGDB_API_1.5.3/FileGDB_API_MACOSX15_64clang.zip
     ;;
   Linux )
     SOURCE_FORMAT=tgz
-    SOURCE_URL=https://github.com/Esri/file-geodatabase-api/raw/master/FileGDB_API_1.5.1/FileGDB_API_1_5_1-64gcc51.tar.gz
+    SOURCE_URL=https://github.com/Esri/file-geodatabase-api/raw/master/FileGDB_API_1.5.3/FileGDB_API-RHEL8-64gcc83.tar.gz
     ;;
 esac
